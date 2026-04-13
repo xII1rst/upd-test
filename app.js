@@ -4901,8 +4901,6 @@ function grafClear() {
   grafInitFields();
 }
 
-}
-
 function grafGridStep(range, targetDivs) {
   const raw = range/targetDivs;
   const mag = Math.pow(10, Math.floor(Math.log10(Math.max(raw,1e-10))));
