@@ -414,13 +414,17 @@ function toggleFigure(){
 
 // ── MATH HELPERS ──────────────────────────────────────
 
+// ── CANVAS COLOR HELPER ──────────────────────────────────────────────────
+// Lee variables CSS en runtime → el canvas respeta el tema activo
+// IMPORTANTE: debe estar ANTES de initTheme() para evitar TDZ en _root
+const _root = document.documentElement;
+function cssVar(name){
+  return getComputedStyle(_root).getPropertyValue(name).trim() || name;
+}
+
 // ── THEME SYSTEM ──────────────────────────────────────────────────────────
 // Persiste en localStorage. Aplica data-theme="light"|"dark" al <html>.
 // El CSS hace el resto vía [data-theme="light"] selectors.
-(function initTheme(){
-  const saved = localStorage.getItem('sc-theme') || 'dark';
-  applyTheme(saved, false);
-})();
 
 function applyTheme(theme, animate = true){
   const root   = document.documentElement;
@@ -464,12 +468,11 @@ function toggleTheme(){
 }
 // ── END THEME SYSTEM ──────────────────────────────────────────────────────
 
-// ── CANVAS COLOR HELPER ──────────────────────────────────────────────────
-// Lee variables CSS en runtime → el canvas respeta el tema activo
-const _root = document.documentElement;
-function cssVar(name){
-  return getComputedStyle(_root).getPropertyValue(name).trim() || name;
-}
+// Inicializar tema — DESPUÉS de declarar _root, cssVar y applyTheme
+(function initTheme(){
+  const saved = localStorage.getItem('sc-theme') || 'dark';
+  applyTheme(saved, false);
+})();
 // Colores de canvas pre-cacheados — se actualizan al cambiar tema
 let _canvasColors = {};
 function refreshCanvasColors(){
