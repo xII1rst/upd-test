@@ -70,9 +70,11 @@
   ];
 
   let currentPalette = COLORS_DARK;
+  let opacityMult = 1;  // dark = 1x, light = 3x para compensar fondo claro
   function refreshPalette(){
-    currentPalette = document.documentElement.getAttribute('data-theme') === 'light'
-      ? COLORS_LIGHT : COLORS_DARK;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    currentPalette = isLight ? COLORS_LIGHT : COLORS_DARK;
+    opacityMult    = isLight ? 3 : 1;
   }
   // Exponer para que el theme system lo llame al cambiar tema
   window.scBgRefreshTheme = refreshPalette;
@@ -133,15 +135,17 @@
     ctx.clearRect(0, 0, W, H);
     items.forEach(it => {
       const baseColor = currentPalette[it.color];
+      const op = Math.min(it.opacity * opacityMult, 1);
       ctx.save();
       ctx.translate(it.x, it.y);
       ctx.rotate(it.angle);
       ctx.font = `${it.size}px "Space Mono", monospace`;
       if(it.layer === 0){
-        ctx.globalAlpha = it.opacity * 0.6;
-        ctx.fillStyle = baseColor + (it.opacity * 0.6) + ')';
+        const layerOp = op * 0.6;
+        ctx.globalAlpha = layerOp;
+        ctx.fillStyle = baseColor + layerOp + ')';
       } else {
-        ctx.fillStyle = baseColor + it.opacity + ')';
+        ctx.fillStyle = baseColor + op + ')';
       }
       ctx.fillText(it.text, 0, 0);
       ctx.restore();

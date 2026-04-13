@@ -1400,10 +1400,7 @@ body::after {
   --canvas-bg1:        #fff5f8;
 }
 
-/* ── Canvas fondo en light — colores nativos vía JS palette ── */
-[data-theme="light"] #sc-bg-canvas {
-  opacity: .45;
-}
+/* ── Canvas fondo en light — colores y opacidad manejados nativamente por JS ── */
 [data-theme="light"] body::after { opacity: .015; }
 
 /* ── Logo SVG — glow por defecto (dark) y override en light ── */
