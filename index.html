@@ -1,0 +1,1126 @@
+<!DOCTYPE html><!-- SuperCalc v1.11.0 -->
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0a0f1a"/>
+<title>SuperCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+<body>
+<canvas id="sc-bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+<!-- LAUNCHER v3 — Super Calc -->
+<div id="launcher">
+  <div class="sc-logo" style="position:relative">
+    <svg id="sc-omega-logo" width="120" height="120" viewBox="-105 -105 210 210"
+      fill="none" xmlns="http://www.w3.org/2000/svg"
+      style="overflow:visible;filter:drop-shadow(0 0 28px rgba(124,106,247,.35))">
+      <defs>
+        <radialGradient id="gOmega" cx="50%" cy="35%" r="65%">
+          <stop offset="0%"   stop-color="#ede9fe"/>
+          <stop offset="40%"  stop-color="#a594ff"/>
+          <stop offset="100%" stop-color="#5b45d4"/>
+        </radialGradient>
+        <filter id="fGlw" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.8" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fGlwSm" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="1.8" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fHalo" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="8" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Grid -->
+      <g stroke="#7c6af7" stroke-width=".35" opacity=".13">
+        <line x1="-100" y1="-80" x2="100" y2="-80"/>
+        <line x1="-100" y1="-60" x2="100" y2="-60"/>
+        <line x1="-100" y1="-40" x2="100" y2="-40"/>
+        <line x1="-100" y1="-20" x2="100" y2="-20"/>
+        <line x1="-100" y1="0"   x2="100" y2="0"/>
+        <line x1="-100" y1="20"  x2="100" y2="20"/>
+        <line x1="-100" y1="40"  x2="100" y2="40"/>
+        <line x1="-100" y1="60"  x2="100" y2="60"/>
+        <line x1="-100" y1="80"  x2="100" y2="80"/>
+        <line x1="-80" y1="-100" x2="-80" y2="100"/>
+        <line x1="-60" y1="-100" x2="-60" y2="100"/>
+        <line x1="-40" y1="-100" x2="-40" y2="100"/>
+        <line x1="-20" y1="-100" x2="-20" y2="100"/>
+        <line x1="0"   y1="-100" x2="0"   y2="100"/>
+        <line x1="20"  y1="-100" x2="20"  y2="100"/>
+        <line x1="40"  y1="-100" x2="40"  y2="100"/>
+        <line x1="60"  y1="-100" x2="60"  y2="100"/>
+        <line x1="80"  y1="-100" x2="80"  y2="100"/>
+      </g>
+      <!-- Órbitas -->
+      <ellipse cx="0" cy="0" rx="88" ry="24" stroke="#7c6af7" stroke-width="1.2" fill="none" opacity=".55" stroke-dasharray="4 2"/>
+      <ellipse cx="0" cy="0" rx="88" ry="24" stroke="#22d3ee" stroke-width="1.1" fill="none" opacity=".5"  stroke-dasharray="4 2" transform="rotate(60)"/>
+      <ellipse cx="0" cy="0" rx="88" ry="24" stroke="#f0c040" stroke-width="1.1" fill="none" opacity=".5"  stroke-dasharray="4 2" transform="rotate(-60)"/>
+      <!-- Electrones -->
+      <g id="sc-e1">
+        <circle r="14" fill="#080c14" stroke="#7c6af7" stroke-width="1.3" filter="url(#fGlwSm)"/>
+        <text x="0" y="5.5" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#a594ff" filter="url(#fGlwSm)">∑</text>
+      </g>
+      <g id="sc-e2">
+        <circle r="14" fill="#080c14" stroke="#22d3ee" stroke-width="1.3" filter="url(#fGlwSm)"/>
+        <text x="0" y="4.5" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#67e8f9" filter="url(#fGlwSm)">π</text>
+      </g>
+      <g id="sc-e3">
+        <circle r="14" fill="#080c14" stroke="#f0c040" stroke-width="1.3" filter="url(#fGlwSm)"/>
+        <text x="0" y="5.5" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#f0c040" filter="url(#fGlwSm)">∂</text>
+      </g>
+      <!-- Halo + Ω -->
+      <circle cx="0" cy="0" r="40" fill="rgba(124,106,247,.06)" filter="url(#fHalo)"/>
+      <text x="0" y="22" text-anchor="middle" font-family="Georgia,serif" font-size="72" font-weight="700" fill="url(#gOmega)" filter="url(#fGlw)">Ω</text>
+    </svg>
+    <div class="sc-logo-name">Super<span class="hi">Calc</span></div>
+    <div class="sc-logo-sub">Motor de cálculo científico</div>
+    <div class="sc-logo-ver">v 1.11.0</div>
+  </div>
+  <div class="launcher-modules" style="flex-wrap:wrap;justify-content:center">
+    <div class="lmod-card al" onclick="openSubmod('al')">
+      <div class="lmod-icon">𝑨</div>
+      <div class="lmod-name">Álgebra Lineal</div>
+      <div class="lmod-badge al">AL</div>
+    </div>
+    <div class="lmod-card fi" onclick="openSubmod('fi')">
+      <div class="lmod-icon">⚛</div>
+      <div class="lmod-name">Física</div>
+      <div class="lmod-badge fi">FÍS</div>
+    </div>
+    <div class="lmod-card ca" onclick="openSubmod('ca')">
+      <div class="lmod-icon">∫</div>
+      <div class="lmod-name">Cálculo</div>
+      <div class="lmod-badge ca">CAL</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMODULE SELECTOR -->
+<div id="submod-screen">
+  <div class="submod-header">
+    <button class="submod-back" onclick="closeSubmod()">← Inicio</button>
+    <div class="submod-title" id="submod-title"></div>
+  </div>
+  <div class="submod-cards" id="submod-cards"></div>
+</div>
+
+
+<div id="app" style="display:none">
+  <header>
+    <button class="mod-back al" onclick="closeModule('vectors')">← AL</button>
+    <div class="logo">
+      <div class="logo-icon">⟶</div>
+      <div class="logo-inner">
+        <div class="logo-text">Vector<span>3D</span></div>
+        <div class="mod-version">v 1.11.0</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <!-- DEC/FRAC -->
+      <div class="icon-tog" id="frac-tog" onclick="toggleFrac()">
+        <span class="tog-lbl" id="frac-lbl">DEC</span>
+        <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+      </div>
+      <!-- Figura geométrica -->
+      <div class="icon-tog" id="fig-tog" onclick="toggleFigure()">
+        <span class="tog-lbl" id="fig-lbl">FIG</span>
+        <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+      </div>
+      <!-- R2/R3 -->
+      <div class="pill">
+        <button id="br2" onclick="setMode(2)">R²</button>
+        <button id="br3" class="on" onclick="setMode(3)">R³</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="app-body">
+  <div id="cw">
+    <canvas id="c"></canvas>
+    <div id="legend"></div>
+    <button id="btn-reset" onclick="resetView()">↺ Reset</button>
+  </div>
+
+  <div id="panel-tog-wrap">
+    <div id="panel-tog-btn" class="on" onclick="togglePanel()">
+      <span class="tog-lbl" id="panel-tog-lbl">Panel</span>
+      <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+    </div>
+  </div>
+  <div id="bottom">
+    <div class="tabs">
+      <button class="tab on" onclick="showTab('V')">Vectores</button>
+      <button class="tab" onclick="showTab('M')">Cálculos</button>
+      <button class="tab" onclick="showTab('O')">Operaciones</button>
+      <button class="tab" onclick="showTab('E')">Ecuación</button>
+      <button class="tab" onclick="showTab('I')">Incógnita</button>
+      <button class="tab" onclick="showTab('T')">Triángulo</button>
+      <button class="tab" onclick="showTab('F')">Figuras</button>
+    </div>
+    <div id="pV" class="panel on"></div>
+    <div id="pM" class="panel"></div>
+    <div id="pO" class="panel"></div>
+    <div id="pE" class="panel"></div>
+    <div id="pI" class="panel"></div>
+    <div id="pT" class="panel">
+      <div class="panel-inner">
+        <div class="section-title">Triángulo en el espacio R³</div>
+        <p class="panel-desc">Ingresa las coordenadas de los 3 vértices.<br>Se calcularán lados, ángulos internos y se graficará.</p>
+
+        <div class="panel-group">
+          <div class="panel-label" style="color:#f0c040">Punto P</div>
+          <div class="inp-row">
+            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-px" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-py" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-pz" value="0" onfocus="this.select()"/></div>
+          </div>
+        </div>
+
+        <div class="panel-group">
+          <div class="panel-label" style="color:#4da6ff">Punto Q</div>
+          <div class="inp-row">
+            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-qx" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-qy" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-qz" value="0" onfocus="this.select()"/></div>
+          </div>
+        </div>
+
+        <div class="panel-group">
+          <div class="panel-label" style="color:#2dd4a0">Punto R</div>
+          <div class="inp-row">
+            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-rx" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-ry" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-rz" value="0" onfocus="this.select()"/></div>
+          </div>
+        </div>
+
+        <button class="action-btn" onclick="triCalc()">Calcular triángulo</button>
+        <div id="tri-res" class="tri-result"></div>
+      </div></div>
+    <div id="pF" class="panel">
+      <div class="panel-inner">
+        <div class="section-title">Figuras Geométricas 3D</div>
+        <p class="panel-desc">Selecciona una figura, ajusta parámetros y grafícala sobre el canvas.</p>
+
+        <div class="panel-group">
+          <div class="panel-label al">Figura</div>
+          <div class="fig-type-row" id="fig-type-btns">
+            <button class="fig-type-btn on" onclick="figSetType('sphere')">Esfera</button>
+            <button class="fig-type-btn" onclick="figSetType('cylinder')">Cilindro</button>
+            <button class="fig-type-btn" onclick="figSetType('cone')">Cono</button>
+            <button class="fig-type-btn" onclick="figSetType('plane')">Plano</button>
+            <button class="fig-type-btn" onclick="figSetType('torus')">Toro</button>
+          </div>
+        </div>
+
+        <div class="panel-group">
+          <div class="panel-label">Centro (cx, cy, cz)</div>
+          <div class="inp-row">
+            <div class="inp-group"><label>cx</label><input type="number" id="fig-cx" value="0" step="any" onfocus="this.select()"/></div>
+            <div class="inp-group"><label>cy</label><input type="number" id="fig-cy" value="0" step="any" onfocus="this.select()"/></div>
+            <div class="inp-group"><label>cz</label><input type="number" id="fig-cz" value="0" step="any" onfocus="this.select()"/></div>
+          </div>
+        </div>
+
+        <div id="fig-params" class="panel-group"></div>
+
+        <div class="fig-color-row">
+          <div class="inp-group">
+            <label>Color</label>
+            <input type="color" id="fig-color" value="#a594ff" class="color-input"/>
+          </div>
+          <div class="inp-group fig-opacity-group">
+            <label>Opacidad</label>
+            <input type="range" id="fig-opacity" min="5" max="60" value="22" class="range-input"/>
+          </div>
+          <span id="fig-opacity-val" class="opacity-val">22%</span>
+        </div>
+
+        <button class="action-btn" onclick="figDraw()">Graficar</button>
+        <button class="action-btn action-btn-ghost" onclick="figClear()">Limpiar</button>
+        <div id="fig-res" class="fig-result"></div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /#app-body -->
+</div><!-- /#app -->
+
+
+<div id="em-app">
+  <div class="em-header">
+    <button class="em-back" onclick="closeModule('em')">← Inicio</button>
+    <div class="em-logo">
+      <div class="em-logo-text">Electro<span>Mag</span></div>
+      <div class="em-logo-ver">v 1.11.0</div>
+    </div>
+    <div class="em-coord-pill">
+      <button id="em-cart" class="on" onclick="emSetCoord('cart')">XYZ</button>
+      <button id="em-cyl" onclick="emSetCoord('cyl')">CIL</button>
+      <button id="em-sph" onclick="emSetCoord('sph')">ESF</button>
+    </div>
+    <button id="em-fig-btn" onclick="emFigToggle()" style="background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.25);border-radius:8px;color:#a594ff;font-size:10px;font-family:'Space Mono',monospace;padding:5px 10px;cursor:pointer;letter-spacing:.04em;transition:all .2s">⬡ Figura</button>
+  </div>
+
+  <!-- Panel flotante de figuras EM -->
+  <div id="em-fig-panel" style="display:none;position:absolute;top:52px;right:10px;z-index:30;background:#0d1220;border:1px solid #1e2d45;border-radius:12px;padding:14px;width:210px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--al2);margin-bottom:8px">Figura Geométrica</div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="em-fig-type-btn on" onclick="emFigSetType('sphere')">Esfera</button>
+      <button class="em-fig-type-btn" onclick="emFigSetType('cylinder')">Cilindro</button>
+      <button class="em-fig-type-btn" onclick="emFigSetType('cone')">Cono</button>
+      <button class="em-fig-type-btn" onclick="emFigSetType('plane')">Plano</button>
+      <button class="em-fig-type-btn" onclick="emFigSetType('torus')">Toro</button>
+    </div>
+    <div id="em-fig-params" style="margin-bottom:8px"></div>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+      <input type="color" id="em-fig-color" value="#22d3ee" style="width:36px;height:26px;padding:2px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer"/>
+      <input type="range" id="em-fig-opacity" min="5" max="60" value="20" style="flex:1;accent-color:var(--fi)"/>
+      <span id="em-fig-opacity-val" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);min-width:26px">20%</span>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="action-btn" style="flex:1;font-size:10px;padding:7px" onclick="emFigDraw()">Graficar</button>
+      <button class="action-btn" style="flex:1;font-size:10px;padding:7px;background:none;border:1px solid var(--border);color:var(--text3)" onclick="emFigClear()">Limpiar</button>
+    </div>
+  </div>
+
+  <div id="em-cw">
+    <canvas id="em-canvas"></canvas>
+    <div id="em-legend-canvas"></div>
+    <button id="btn-em-reset" onclick="emResetView()" style="position:absolute;top:10px;right:10px;background:rgba(10,15,26,.85);border:1px solid #1e3356;border-radius:8px;color:#8ba3cc;font-size:11px;font-family:Space Mono,monospace;padding:6px 12px;cursor:pointer;letter-spacing:.04em;transition:all .2s">↺ Reset</button>
+  </div>
+
+  <div class="em-panel-tog-wrap">
+    <div id="em-panel-tog-btn" class="on" onclick="emTogglePanel()">
+      <span class="tog-lbl">Panel</span>
+      <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+    </div>
+  </div>
+
+  <div id="em-bottom">
+    <div class="em-tabs">
+      <button class="em-tab on"  onclick="emShowTab('coulomb')">Coulomb</button>
+      <button class="em-tab"     onclick="emShowTab('gauss')">Gauss</button>
+      <button class="em-tab"     onclick="emShowTab('potential')">Potencial</button>
+      <button class="em-tab"     onclick="emShowTab('lorentz')">Lorentz</button>
+      <button class="em-tab"     onclick="emShowTab('faraday')">Faraday</button>
+      <button class="em-tab"     onclick="emShowTab('maxwell')">Maxwell</button>
+    </div>
+    <div id="em-pCoulomb"   class="em-panel on"></div>
+    <div id="em-pGauss"     class="em-panel"></div>
+    <div id="em-pPotential" class="em-panel"></div>
+    <div id="em-pLorentz"   class="em-panel"></div>
+    <div id="em-pFaraday"   class="em-panel"></div>
+    <div id="em-pMaxwell"   class="em-panel"></div>
+  </div>
+</div>
+
+<!-- MATRICES & ECUACIONES LINEALES -->
+<div id="mat-app">
+  <div class="mod-header">
+    <button class="mod-back al" onclick="closeModule('mat')">← AL</button>
+    <div style="flex:1">
+      <div class="mod-logo-text"><span class="al-c">Matrices</span> & Ec. Lineales</div>
+      <div class="mod-logo-ver">v 1.11.0</div>
+    </div>
+  </div>
+  <div class="mat-tabs">
+    <button class="mat-tab on"  onclick="matTab('ops')">Operaciones</button>
+    <button class="mat-tab"     onclick="matTab('det')">Det &amp; Inv</button>
+    <button class="mat-tab"     onclick="matTab('sis')">Sistemas</button>
+    <button class="mat-tab"     onclick="matTab('eig')">Eigenvalores</button>
+  </div>
+  <div class="mat-body">
+    <!-- OPERACIONES -->
+    <div id="mat-pOps" class="mat-panel on">
+      <div class="mat-sec">Operaciones entre matrices</div>
+      <div class="mat-row" style="flex-wrap:wrap;gap:6px">
+        <label>Operación:</label>
+        <select class="mat-sel" id="mat-op" onchange="matOpsRebuild()">
+          <option value="add">Suma A+B+...</option>
+          <option value="sub">Resta A−B−...</option>
+          <option value="mul">Producto A×B×...</option>
+          <option value="sca">Escalar k×A</option>
+          <option value="tra">Transpuesta Aᵀ</option>
+        </select>
+      </div>
+      <div id="mat-ops-controls"></div>
+      <div id="mat-ops-grids"></div>
+      <button class="mat-btn" onclick="matCalcOps()">Calcular</button>
+      <button class="mat-btn sec" onclick="matOpsReset()">Reset</button>
+      <div id="mat-res-ops"></div>
+    </div>
+    <!-- DETERMINANTE E INVERSA -->
+    <div id="mat-pDet" class="mat-panel">
+      <div class="mat-sec">Determinante e Inversa</div>
+      <div class="mat-row">
+        <label>Tamaño n×n:</label>
+        <input class="mat-inp" id="mat-dn" value="2" min="1" max="5" type="number" onchange="matBuildDet()" onfocus="this.select()">
+      </div>
+      <div id="mat-det-grid"></div>
+      <button class="mat-btn" onclick="matCalcDet()">Calcular Det</button>
+      <button class="mat-btn" onclick="matCalcInv()">Calcular Inv</button>
+      <button class="mat-btn sec" onclick="matClearDet()">Limpiar</button>
+      <div id="mat-res-det"></div>
+    </div>
+    <!-- SISTEMAS -->
+    <div id="mat-pSis" class="mat-panel">
+      <div class="mat-sec">Sistemas de Ecuaciones — Ax = b</div>
+      <div class="mat-row">
+        <label>Ecuaciones:</label>
+        <input class="mat-inp" id="mat-sn" value="2" min="2" max="6" type="number" onchange="matBuildSis()" onfocus="this.select()">
+        <label>Método:</label>
+        <select class="mat-sel" id="mat-smet">
+          <option value="gauss">Gauss-Jordan</option>
+          <option value="cramer">Cramer</option>
+        </select>
+      </div>
+      <div id="mat-sis-grid"></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button class="mat-btn" onclick="matCalcSis()">Resolver</button>
+        <button class="mat-btn sec" onclick="matClearSis()">Limpiar</button>
+        <div class="icon-tog" id="sis-frac-tog" onclick="matSisToggleFrac()" style="margin-left:auto">
+          <span class="tog-lbl" id="sis-frac-lbl">DEC</span>
+          <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+        </div>
+      </div>
+      <div id="mat-res-sis"></div>
+    </div>
+    <!-- EIGENVALORES -->
+    <div id="mat-pEig" class="mat-panel">
+      <div class="mat-sec">Valores &amp; Vectores Propios</div>
+      <div class="mat-row">
+        <label>Tamaño n×n:</label>
+        <input class="mat-inp" id="mat-en" value="2" min="2" max="4" type="number" onchange="matBuildEig()" onfocus="this.select()">
+      </div>
+      <div id="mat-eig-grid"></div>
+      <button class="mat-btn" onclick="matCalcEig()">Calcular</button>
+      <button class="mat-btn sec" onclick="matClearEig()">Limpiar</button>
+      <div id="mat-res-eig"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- INECUACIONES -->
+<div id="ineq-app">
+  <div class="mod-header">
+    <button class="mod-back al" onclick="closeModule('ineq')">← AL</button>
+    <div style="flex:1">
+      <div class="mod-logo-text"><span class="al-c">Inecuaciones</span></div>
+      <div class="mod-logo-ver">v 1.11.0</div>
+    </div>
+  </div>
+  <!-- TYPE PICKER -->
+  <div id="ineq-pick-screen" class="ineq-pick">
+    <div class="ineq-pick-title">Selecciona el tipo</div>
+    <div class="ineq-type-grid">
+      <div class="ineq-type-card" onclick="ineqSetType('libre')">
+        <div class="ineq-type-icon">✎</div>
+        <div class="ineq-type-name">Expresión libre</div>
+        <div class="ineq-type-desc">f(x) ⊳ g(x) — escribe directo</div>
+      </div>
+      <div class="ineq-type-card" onclick="ineqSetType('quad')">
+        <div class="ineq-type-icon">📐</div>
+        <div class="ineq-type-name">Cuadrática</div>
+        <div class="ineq-type-desc">ax² + bx + c ⊳ 0</div>
+      </div>
+      <div class="ineq-type-card" onclick="ineqSetType('rational')">
+        <div class="ineq-type-icon">P/Q</div>
+        <div class="ineq-type-name">Racional</div>
+        <div class="ineq-type-desc">P(x)/Q(x) ⊳ 0 — tabla de signos</div>
+      </div>
+      <div class="ineq-type-card" onclick="ineqSetType('system')">
+        <div class="ineq-type-icon">🔗</div>
+        <div class="ineq-type-name">Sistema</div>
+        <div class="ineq-type-desc">2 inecuaciones lineales</div>
+      </div>
+      <div class="ineq-type-card" onclick="ineqSetType('abs')">
+        <div class="ineq-type-icon">| |</div>
+        <div class="ineq-type-name">Valor Absoluto</div>
+        <div class="ineq-type-desc">|ax + b| ⊳ c</div>
+      </div>
+    </div>
+  </div>
+  <!-- SOLVER -->
+  <div id="ineq-solver" class="ineq-solver">
+    <div class="mod-header" style="background:#111827;border-top:1px solid #1e2d45;border-bottom:1px solid #1e2d45;padding:8px 14px;">
+      <button class="ineq-btn sec" onclick="ineqBack()" style="font-size:10px;padding:5px 10px;">← Tipos</button>
+      <span id="ineq-solver-title" style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#f472b6;margin-left:8px;"></span>
+    </div>
+    <div class="ineq-solver-body" id="ineq-solver-body"></div>
+  </div>
+</div>
+
+<!-- FUNCIONES MODULE -->
+
+
+<!-- SUCESIONES MODULE -->
+<div id="seq-app">
+  <div class="mod-header">
+    <button class="mod-back al" onclick="closeModule('seq')">← AL</button>
+    <div style="flex:1">
+      <div class="mod-logo-text"><span class="al-c">Sucesiones & Prog.</span></div>
+      <div class="mod-logo-ver">v 1.11.0</div>
+    </div>
+  </div>
+  <div class="calc-tabs">
+    <button class="seq-tab on" id="seq-tab-terminos" onclick="seqSetMode('terminos')">Σ Término n-ésimo</button>
+    <button class="seq-tab" id="seq-tab-pa" onclick="seqSetMode('pa')">PA Aritmética</button>
+    <button class="seq-tab" id="seq-tab-pg" onclick="seqSetMode('pg')">PG Geométrica</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px">
+    <!-- Panel término n-ésimo -->
+    <div id="seq-panel-terminos">
+      <div class="calc-sec">Término n-ésimo — Sₙ</div>
+      <div class="calc-field-row">
+        <label>Sₙ =</label>
+        <input class="calc-inp" id="seq-expr" placeholder="ej: 3n-2^n, -n^2/(1-2n), (1+1/n)^(2n)"/>
+      </div>
+      <div class="calc-field-row">
+        <label>Mostrar</label>
+        <input class="calc-inp calc-inp-sm" id="seq-n" value="0" type="number" min="1" max="20" onfocus="this.select()"/>
+        <label>términos</label>
+      </div>
+      <button class="ineq-btn" onclick="seqAnalyzeTerminos()">Analizar sucesión</button>
+    </div>
+    <!-- Panel PA -->
+    <div id="seq-panel-pa" style="display:none">
+      <div class="calc-sec">Progresión Aritmética</div>
+      <div class="calc-field-row">
+        <label>a₁ =</label><input class="calc-inp calc-inp-sm" id="pa-a1" value="0" type="number" step="any" onfocus="this.select()"/>
+        <label>d =</label><input class="calc-inp calc-inp-sm" id="pa-d" value="0" type="number" step="any" onfocus="this.select()"/>
+        <label>n =</label><input class="calc-inp calc-inp-sm" id="pa-n" value="0" type="number" min="1" onfocus="this.select()"/>
+      </div>
+      <button class="ineq-btn" onclick="seqAnalyzePA()">Calcular PA</button>
+    </div>
+    <!-- Panel PG -->
+    <div id="seq-panel-pg" style="display:none">
+      <div class="calc-sec">Progresión Geométrica</div>
+      <div class="calc-field-row">
+        <label>a₁ =</label><input class="calc-inp calc-inp-sm" id="pg-a1" value="0" type="number" step="any" onfocus="this.select()"/>
+        <label>r =</label><input class="calc-inp calc-inp-sm" id="pg-r" value="0" type="number" step="any" onfocus="this.select()"/>
+        <label>n =</label><input class="calc-inp calc-inp-sm" id="pg-n" value="0" type="number" min="1" onfocus="this.select()"/>
+      </div>
+      <button class="ineq-btn" onclick="seqAnalyzePG()">Calcular PG</button>
+    </div>
+    <div id="seq-result" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- CÁLCULO MODULE -->
+<div id="calc-app">
+  <div class="mod-header">
+    <button class="mod-back-btn" onclick="closeModule('calc')">← Atrás</button>
+    <div class="mod-header-title">Cálculo</div>
+    <div style="width:60px"></div>
+  </div>
+<div class="calc-tabs">
+  <button class="calc-tab on"  onclick="calcTab('dif')">∂ Diferencial</button>
+  <button class="calc-tab"     onclick="calcTab('int')">∫ Integral</button>
+  <button class="calc-tab"     onclick="calcTab('mul')">∇ Multivariable</button>
+  <button class="calc-tab"     onclick="calcTab('edo')">dy/dx Ec. Dif.</button>
+  <button class="calc-tab"     onclick="calcTab('graf')">📈 Graficar</button>
+</div>
+
+<!-- ══ DIFERENCIAL ══ -->
+<div class="calc-panel on" id="calc-pDif">
+  <div class="calc-scroll">
+    <div class="calc-keyboard" id="calc-kb-dif"></div>
+
+    <!-- Límites -->
+    <div class="calc-card" id="card-lim">
+      <div class="calc-card-header" onclick="toggleCard('lim')">
+        <div class="calc-card-icon">lim</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Límites</div>
+          <div class="calc-card-desc">lim f(x) cuando x → a</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-lim">›</div>
+      </div>
+      <div class="calc-card-body" id="body-lim">
+        <div class="calc-card-inner">
+          <!-- Límite simple -->
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="dif-lim-fx" placeholder="ej: sin(x)/x, (x^2-4)/(x-2)"/>
+          </div>
+          <div class="calc-field-row">
+            <label>x →</label>
+            <input class="calc-inp calc-inp-sm" id="dif-lim-a" placeholder="ej: 0, π/4, ln(2)"/>
+            <label>Lado:</label>
+            <select class="mat-sel" id="dif-lim-side">
+              <option value="both">Bilateral</option>
+              <option value="right">Derecho (+)</option>
+              <option value="left">Izquierdo (−)</option>
+            </select>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcLimit()">Calcular límite</button>
+            <button class="calc-btn sec" onclick="clearCard('lim')">Limpiar</button>
+          </div>
+          <div id="res-lim" class="calc-res"></div>
+
+          <!-- Operación entre dos límites -->
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <button class="calc-btn sec" style="width:100%;font-size:9px" onclick="toggleLimOp()">
+              ⊕ Operar entre dos límites
+            </button>
+            <div id="lim-op-panel" style="margin-top:10px">
+              <div class="app-panel">
+                <div class="app-panel-title">Límite A</div>
+                <div class="calc-field-row">
+                  <label>f(x) =</label>
+                  <input class="calc-inp" id="lim-op-fx1" placeholder="ej: x^2"/>
+                </div>
+                <div class="calc-field-row">
+                  <label>x →</label>
+                  <input class="calc-inp calc-inp-sm" id="lim-op-a1" placeholder="0"/>
+                  <select class="mat-sel" id="lim-op-side1">
+                    <option value="both">Bilateral</option>
+                    <option value="right">Der (+)</option>
+                    <option value="left">Izq (−)</option>
+                  </select>
+                </div>
+              </div>
+              <div style="text-align:center;margin:6px 0">
+                <select class="mat-sel" id="lim-op-op" style="width:80px;text-align:center">
+                  <option value="+">＋</option>
+                  <option value="−">－</option>
+                  <option value="*">×</option>
+                  <option value="/">÷</option>
+                </select>
+              </div>
+              <div class="app-panel">
+                <div class="app-panel-title">Límite B</div>
+                <div class="calc-field-row">
+                  <label>f(x) =</label>
+                  <input class="calc-inp" id="lim-op-fx2" placeholder="ej: sin(x)/x"/>
+                </div>
+                <div class="calc-field-row">
+                  <label>x →</label>
+                  <input class="calc-inp calc-inp-sm" id="lim-op-a2" placeholder="0"/>
+                  <select class="mat-sel" id="lim-op-side2">
+                    <option value="both">Bilateral</option>
+                    <option value="right">Der (+)</option>
+                    <option value="left">Izq (−)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="calc-btn-row" style="margin-top:8px">
+                <button class="calc-btn" onclick="calcLimitOp()">Calcular operación</button>
+              </div>
+              <div id="res-lim-op" class="calc-res"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Derivada explícita -->
+    <div class="calc-card" id="card-der">
+      <div class="calc-card-header" onclick="toggleCard('der')">
+        <div class="calc-card-icon">d/dx</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Derivada Explícita</div>
+          <div class="calc-card-desc">f'(x) simbólica — reglas de derivación</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-der">›</div>
+      </div>
+      <div class="calc-card-body" id="body-der">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="dif-der-fx" placeholder="ej: 2*x^25"/>
+          </div>
+          <div class="calc-field-row">
+            <label>Orden:</label>
+            <select class="mat-sel" id="dif-der-ord">
+              <option value="1">Primera (f')</option>
+              <option value="2">Segunda (f'')</option>
+              <option value="3">Tercera (f''')</option>
+            </select>
+            <label>Evaluar en x =</label>
+            <input class="calc-inp calc-inp-sm" id="dif-der-pt" placeholder="opcional"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcDerivative()">Derivar</button>
+            <button class="calc-btn sec" onclick="clearCard('der')">Limpiar</button>
+          </div>
+          <div id="res-der" class="calc-res"></div>
+
+          <!-- Sub-panel aplicaciones -->
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <button class="calc-btn sec" style="width:100%;font-size:9px" onclick="toggleApps()">
+              ⚙ Aplicaciones de Derivadas
+            </button>
+            <div id="apps-panel" style="margin-top:10px">
+              <div class="app-panel">
+                <div class="app-panel-title">Modo Aplicaciones</div>
+                <div class="app-sel-grid">
+                  <div class="app-sel-btn on" id="app-btn-opt" onclick="setApp('opt')">
+                    <div class="app-sel-icon">📐</div>
+                    <div class="app-sel-name">Optimización</div>
+                    <div class="app-sel-form">max/min de f(x)</div>
+                  </div>
+                  <div class="app-sel-btn" id="app-btn-pob" onclick="setApp('pob')">
+                    <div class="app-sel-icon">📈</div>
+                    <div class="app-sel-name">Crecimiento</div>
+                    <div class="app-sel-form">P(t) = P₀·eᵏᵗ</div>
+                  </div>
+                  <div class="app-sel-btn" id="app-btn-vel" onclick="setApp('vel')">
+                    <div class="app-sel-icon">🚀</div>
+                    <div class="app-sel-name">Movimiento</div>
+                    <div class="app-sel-form">v = s'(t), a = v'(t)</div>
+                  </div>
+                  <div class="app-sel-btn" id="app-btn-tan" onclick="setApp('tan')">
+                    <div class="app-sel-icon">📏</div>
+                    <div class="app-sel-name">Recta Tangente</div>
+                    <div class="app-sel-form">y = f'(x₀)(x−x₀) + f(x₀)</div>
+                  </div>
+                  <div class="app-sel-btn" id="app-btn-rel" onclick="setApp('rel')">
+                    <div class="app-sel-icon">🔗</div>
+                    <div class="app-sel-name">Tasas Relacionadas</div>
+                    <div class="app-sel-form">dV/dt, dA/dt, etc.</div>
+                  </div>
+                </div>
+                <div id="app-form-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Derivada implícita -->
+    <div class="calc-card" id="card-imp">
+      <div class="calc-card-header" onclick="toggleCard('imp')">
+        <div class="calc-card-icon">∂y</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Derivada Implícita</div>
+          <div class="calc-card-desc">F(x,y) = 0  →  dy/dx = −Fx/Fy</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-imp">›</div>
+      </div>
+      <div class="calc-card-body" id="body-imp">
+        <div class="calc-card-inner">
+          <div style="font-size:9px;color:var(--text3);font-family:'Space Mono',monospace;margin-bottom:10px;line-height:1.8">
+            Ingresa F(x,y) tal que F(x,y) = 0<br>
+            Ej: x² + y² − 25 &nbsp;→&nbsp; círculo de r=5
+          </div>
+          <div class="calc-field-row">
+            <label>F(x,y) =</label>
+            <input class="calc-inp" id="dif-imp-fxy" placeholder="ej: x^2 + y^2 - 25"/>
+          </div>
+          <div class="calc-field-row">
+            <label>en (x₀,y₀):</label>
+            <input class="calc-inp calc-inp-sm" id="dif-imp-x0" placeholder="x₀"/>
+            <input class="calc-inp calc-inp-sm" id="dif-imp-y0" placeholder="y₀"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcImplicit()">Calcular dy/dx</button>
+            <button class="calc-btn sec" onclick="clearCard('imp')">Limpiar</button>
+          </div>
+          <div id="res-imp" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análisis -->
+    <div class="calc-card" id="card-ana">
+      <div class="calc-card-header" onclick="toggleCard('ana')">
+        <div class="calc-card-icon">📊</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Análisis de Función</div>
+          <div class="calc-card-desc">Monotonía, extremos, concavidad, inflexiones</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-ana">›</div>
+      </div>
+      <div class="calc-card-body" id="body-ana">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="dif-ana-fx" placeholder="ej: x^3 - 3*x"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcAnalysis()">Analizar</button>
+            <button class="calc-btn sec" onclick="clearCard('ana')">Limpiar</button>
+          </div>
+          <div id="res-ana" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INTEGRAL ══ -->
+<div class="calc-panel" id="calc-pInt">
+  <div class="calc-scroll">
+    <div class="calc-keyboard" id="calc-kb-int"></div>
+
+    <div class="calc-card" id="card-indef">
+      <div class="calc-card-header" onclick="toggleCard('indef')">
+        <div class="calc-card-icon">∫</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Integral Indefinida</div>
+          <div class="calc-card-desc">∫ f(x) dx — reglas básicas + verificación</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-indef">›</div>
+      </div>
+      <div class="calc-card-body" id="body-indef">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="int-indef-fx" placeholder="ej: 3*x^2 + cos(x)"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcIntegralIndef()">∫ f(x) dx</button>
+            <button class="calc-btn sec" onclick="clearCard('indef')">Limpiar</button>
+          </div>
+          <div id="res-indef" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-def">
+      <div class="calc-card-header" onclick="toggleCard('def')">
+        <div class="calc-card-icon">∫ₐᵇ</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Integral Definida</div>
+          <div class="calc-card-desc">∫ₐᵇ f(x) dx — Simpson con n=1000</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-def">›</div>
+      </div>
+      <div class="calc-card-body" id="body-def">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="int-def-fx" placeholder="ej: x^2"/>
+          </div>
+          <div class="calc-field-row">
+            <label>a =</label>
+            <input class="calc-inp calc-inp-sm" id="int-def-a" placeholder="0"/>
+            <label>b =</label>
+            <input class="calc-inp calc-inp-sm" id="int-def-b" placeholder="1"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcIntegralDef()">∫ₐᵇ f(x) dx</button>
+            <button class="calc-btn sec" onclick="clearCard('def')">Limpiar</button>
+          </div>
+          <div id="res-def" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-taylor">
+      <div class="calc-card-header" onclick="toggleCard('taylor')">
+        <div class="calc-card-icon">Σ</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Serie de Taylor / Maclaurin</div>
+          <div class="calc-card-desc">Expansión en serie de potencias alrededor de a</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-taylor">›</div>
+      </div>
+      <div class="calc-card-body" id="body-taylor">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x) =</label>
+            <input class="calc-inp" id="int-taylor-fx" placeholder="ej: e^x, sin(x)"/>
+          </div>
+          <div class="calc-field-row">
+            <label>Centro a =</label>
+            <input class="calc-inp calc-inp-sm" id="int-taylor-a" placeholder="0"/>
+            <label>Términos:</label>
+            <input class="calc-inp calc-inp-sm" id="int-taylor-n" placeholder="5" style="width:50px"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcTaylor()">Expandir</button>
+            <button class="calc-btn sec" onclick="clearCard('taylor')">Limpiar</button>
+          </div>
+          <div id="res-taylor" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MULTIVARIABLE ══ -->
+<div class="calc-panel" id="calc-pMul">
+  <div class="calc-scroll">
+    <div class="calc-keyboard" id="calc-kb-mul"></div>
+
+    <div class="calc-card" id="card-par">
+      <div class="calc-card-header" onclick="toggleCard('par')">
+        <div class="calc-card-icon">∂/∂</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Derivadas Parciales</div>
+          <div class="calc-card-desc">∂f/∂x, ∂f/∂y — 1er y 2do orden</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-par">›</div>
+      </div>
+      <div class="calc-card-body" id="body-par">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x,y) =</label>
+            <input class="calc-inp" id="mul-par-fxy" placeholder="ej: x^2*y + sin(x*y)"/>
+          </div>
+          <div class="calc-field-row">
+            <label>Var:</label>
+            <select class="mat-sel" id="mul-par-var">
+              <option value="x">∂f/∂x</option>
+              <option value="y">∂f/∂y</option>
+            </select>
+            <label>Orden:</label>
+            <select class="mat-sel" id="mul-par-ord">
+              <option value="1">1°</option>
+              <option value="2">2°</option>
+            </select>
+            <label>en (x,y):</label>
+            <input class="calc-inp calc-inp-sm" id="mul-par-x0" placeholder="x₀"/>
+            <input class="calc-inp calc-inp-sm" id="mul-par-y0" placeholder="y₀"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcPartial()">Derivar</button>
+            <button class="calc-btn sec" onclick="clearCard('par')">Limpiar</button>
+          </div>
+          <div id="res-par" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-grad">
+      <div class="calc-card-header" onclick="toggleCard('grad')">
+        <div class="calc-card-icon">∇</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Gradiente ∇f</div>
+          <div class="calc-card-desc">Vector de derivadas parciales en un punto</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-grad">›</div>
+      </div>
+      <div class="calc-card-body" id="body-grad">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x,y) =</label>
+            <input class="calc-inp" id="mul-grad-fxy" placeholder="ej: x^2 + y^2"/>
+          </div>
+          <div class="calc-field-row">
+            <label>en (x₀,y₀):</label>
+            <input class="calc-inp calc-inp-sm" id="mul-grad-x0" placeholder="x₀"/>
+            <input class="calc-inp calc-inp-sm" id="mul-grad-y0" placeholder="y₀"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcGradient()">∇f</button>
+            <button class="calc-btn sec" onclick="clearCard('grad')">Limpiar</button>
+          </div>
+          <div id="res-grad" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-dint">
+      <div class="calc-card-header" onclick="toggleCard('dint')">
+        <div class="calc-card-icon">∬</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">Integral Doble ∬</div>
+          <div class="calc-card-desc">∬ f(x,y) dx dy sobre región rectangular</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-dint">›</div>
+      </div>
+      <div class="calc-card-body" id="body-dint">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>f(x,y) =</label>
+            <input class="calc-inp" id="mul-dint-fxy" placeholder="ej: x*y"/>
+          </div>
+          <div class="calc-field-row">
+            <label>x:[</label>
+            <input class="calc-inp calc-inp-sm" id="mul-dint-x1" placeholder="0"/>
+            <label>,</label>
+            <input class="calc-inp calc-inp-sm" id="mul-dint-x2" placeholder="1"/>
+            <label>] &nbsp; y:[</label>
+            <input class="calc-inp calc-inp-sm" id="mul-dint-y1" placeholder="0"/>
+            <label>,</label>
+            <input class="calc-inp calc-inp-sm" id="mul-dint-y2" placeholder="1"/>
+            <label>]</label>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcDoubleIntegral()">∬ f dx dy</button>
+            <button class="calc-btn sec" onclick="clearCard('dint')">Limpiar</button>
+          </div>
+          <div id="res-dint" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDO ══ -->
+<div class="calc-panel" id="calc-pEdo">
+  <div class="calc-scroll">
+    <div class="calc-keyboard" id="calc-kb-edo"></div>
+
+    <div class="calc-card" id="card-sep">
+      <div class="calc-card-header" onclick="toggleCard('sep')">
+        <div class="calc-card-icon">dy/dx</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">1er Orden — Variables Separables</div>
+          <div class="calc-card-desc">dy/dx = f(x)·g(y) con condición inicial</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-sep">›</div>
+      </div>
+      <div class="calc-card-body" id="body-sep">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>dy/dx =</label>
+            <input class="calc-inp" id="edo-sep-rhs" placeholder="ej: x*y"/>
+          </div>
+          <div class="calc-field-row">
+            <label>y(</label>
+            <input class="calc-inp calc-inp-sm" id="edo-sep-x0" placeholder="x₀"/>
+            <label>) =</label>
+            <input class="calc-inp calc-inp-sm" id="edo-sep-y0" placeholder="y₀"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcEDOSep()">Resolver (RK4)</button>
+            <button class="calc-btn sec" onclick="clearCard('sep')">Limpiar</button>
+          </div>
+          <div id="res-sep" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-edolin">
+      <div class="calc-card-header" onclick="toggleCard('edolin')">
+        <div class="calc-card-icon">μ(x)</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">1er Orden — ED Lineal</div>
+          <div class="calc-card-desc">y' + P(x)y = Q(x) — factor integrante</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-edolin">›</div>
+      </div>
+      <div class="calc-card-body" id="body-edolin">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>P(x) =</label>
+            <input class="calc-inp" id="edo-lin-px" placeholder="ej: 2, 1/x"/>
+          </div>
+          <div class="calc-field-row">
+            <label>Q(x) =</label>
+            <input class="calc-inp" id="edo-lin-qx" placeholder="ej: x^2, e^x"/>
+          </div>
+          <div class="calc-field-row">
+            <label>y(</label>
+            <input class="calc-inp calc-inp-sm" id="edo-lin-x0" placeholder="x₀"/>
+            <label>) =</label>
+            <input class="calc-inp calc-inp-sm" id="edo-lin-y0" placeholder="y₀"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcEDOLinear()">Resolver (RK4)</button>
+            <button class="calc-btn sec" onclick="clearCard('edolin')">Limpiar</button>
+          </div>
+          <div id="res-edolin" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card" id="card-edo2">
+      <div class="calc-card-header" onclick="toggleCard('edo2')">
+        <div class="calc-card-icon">ay''</div>
+        <div class="calc-card-info">
+          <div class="calc-card-name">2do Orden — Coef. Constantes</div>
+          <div class="calc-card-desc">ay'' + by' + cy = 0 — ecuación característica</div>
+        </div>
+        <div class="calc-card-arrow" id="arr-edo2">›</div>
+      </div>
+      <div class="calc-card-body" id="body-edo2">
+        <div class="calc-card-inner">
+          <div class="calc-field-row">
+            <label>a=</label>
+            <input class="calc-inp calc-inp-sm" id="edo-2do-a" placeholder="1"/>
+            <label>b=</label>
+            <input class="calc-inp calc-inp-sm" id="edo-2do-b" placeholder="0"/>
+            <label>c=</label>
+            <input class="calc-inp calc-inp-sm" id="edo-2do-c" placeholder="0"/>
+          </div>
+          <div class="calc-field-row">
+            <label>y(0)=</label>
+            <input class="calc-inp calc-inp-sm" id="edo-2do-y0" placeholder="1"/>
+            <label>y'(0)=</label>
+            <input class="calc-inp calc-inp-sm" id="edo-2do-dy0" placeholder="0"/>
+          </div>
+          <div class="calc-btn-row">
+            <button class="calc-btn" onclick="calcEDO2nd()">Resolver</button>
+            <button class="calc-btn sec" onclick="clearCard('edo2')">Limpiar</button>
+          </div>
+          <div id="res-edo2" class="calc-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GRAFICAR ══ -->
+<div class="calc-panel" id="calc-pGraf">
+  <div class="calc-scroll">
+    <div class="calc-sec">Graficador de funciones</div>
+    <div class="graf-type-grid">
+      <div class="graf-type-card sel" id="gtype-lin" onclick="grafSetType('lin')">
+        <div class="graf-type-icon">━</div><div class="graf-type-name">Lineal</div>
+      </div>
+      <div class="graf-type-card" id="gtype-quad" onclick="grafSetType('quad')">
+        <div class="graf-type-icon">∪</div><div class="graf-type-name">Cuadrática</div>
+      </div>
+      <div class="graf-type-card" id="gtype-abs" onclick="grafSetType('abs')">
+        <div class="graf-type-icon">|x|</div><div class="graf-type-name">Valor Abs.</div>
+      </div>
+      <div class="graf-type-card" id="gtype-exp" onclick="grafSetType('exp')">
+        <div class="graf-type-icon">bˣ</div><div class="graf-type-name">Exponencial</div>
+      </div>
+      <div class="graf-type-card" id="gtype-raiz" onclick="grafSetType('raiz')">
+        <div class="graf-type-icon">√</div><div class="graf-type-name">Raíz</div>
+      </div>
+      <div class="graf-type-card" id="gtype-log" onclick="grafSetType('log')">
+        <div class="graf-type-icon">log</div><div class="graf-type-name">Logarítmica</div>
+      </div>
+      <div class="graf-type-card" id="gtype-racional" onclick="grafSetType('racional')">
+        <div class="graf-type-icon">P/Q</div><div class="graf-type-name">Racional</div>
+      </div>
+    </div>
+    <div class="graf-inputs-section">
+      <div class="calc-sec" id="graf-inputs-title">Coeficientes — Lineal</div>
+      <div id="graf-coef-fields"></div>
+      <div class="graf-formula-preview" id="graf-formula-preview">y = x</div>
+      <div class="calc-field-row" style="margin-top:6px">
+        <label>Puntos: x = −N … N, N =</label>
+        <input class="calc-inp calc-inp-sm" id="graf-pts-n" value="3" type="number" min="1" max="10" onfocus="this.select()"/>
+      </div>
+      <div class="calc-btn-row">
+        <button class="calc-btn" onclick="grafDraw()">Graficar</button>
+        <button class="calc-btn sec" onclick="grafClear()">Limpiar</button>
+      </div>
+    </div>
+    <div id="graf-canvas-wrap" class="graf-canvas-wrap">
+      <canvas id="graf-cv"></canvas>
+    </div>
+    <div id="graf-table-wrap" class="graf-table-wrap">
+      <div class="graf-table-title">Tabla de valores</div>
+      <div id="graf-table"></div>
+    </div>
+    <div id="graf-steps-wrap">
+      <div class="calc-sec">Pasos de cálculo</div>
+      <div id="graf-steps" class="graf-steps"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="sc-author-footer">Ing. Rafael Miranda &nbsp;·&nbsp; (xII1rst)</div>
+
+<script src="app.js"></script>
+</body>
+</html>
