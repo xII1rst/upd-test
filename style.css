@@ -1,28 +1,7 @@
 /* SuperCalc v3.0.0 — Stylesheet */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:var(--bg);
-  --surface:var(--surface);
-  --surface2:var(--surface2);
-  --surface3:var(--surface3);
-  --border:var(--border);
-  --border2:var(--border2);
-  --text:var(--text);
-  --text2:var(--text2);
-  --text3:var(--text3);
-  --accent:var(--accent);
-  --accent2:#e8a820;
-  --red:var(--red);
-  --green:var(--green);
-  --blue:var(--blue);
-  --purple:var(--purple);
-  --orange:#ff8c42;
-  --pink:#ff6eb4;
-  --teal:#34d4c8;
-  --r: 14px;
-  --r2: 10px;
-}
+
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);
   font-family:'Space Grotesk',sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
 #app{display:flex;flex-direction:column;width:100vw;height:100dvh;overflow:hidden}
@@ -527,12 +506,7 @@ canvas:active{cursor:grabbing}
 
 
 /* ══════ SUPER CALC v3.0.0 — DESIGN TOKENS ══════ */
-:root {
-  --al: var(--al); --al2: var(--al2);
-  --fi: var(--fi); --fi2: var(--fi2);
-  --mat-accent: var(--al);
-  --ineq-accent: #f472b6;
-}
+
 
 /* ── LAUNCHER v3 ─────────────────────── */
 #launcher {
@@ -844,9 +818,7 @@ canvas:active{cursor:grabbing}
 
   
 /* ══════ CÁLCULO MODULE v2.0.0 ══════ */
-:root {
-  --ca: var(--ca); --ca2: var(--ca2);  /* esmeralda — Cálculo */
-}
+
 
 .lmod-card.ca:hover {
   border-color:rgba(16,185,129,.6);
@@ -1385,84 +1357,104 @@ body::after {
 }
 
 /* ══════════════════════════════════════════════════════
-   TEMA LIGHT — GIRLY EDITION
-   El rosa es el neutro, no el acento.
+   SISTEMA DE TEMAS — tokens de color
    ══════════════════════════════════════════════════════
-
-   Fondo      → blanco con temperatura rosa
-   Superficies → capas de rosa muy suave
-   Texto      → borgoña (no negro ni marrón)
-   AL         → amarillo brillante (contrasta sobre rosa)
-   FÍS        → rosa intenso (protagonista)
-   CAL        → melocotón-miel cálido
+   Estrategia: el CSS usa SOLO var() en todas las reglas.
+   Al cambiar data-theme, las variables se actualizan y
+   TODO el UI hereda los nuevos valores automáticamente.
+   No se necesitan 150 selectores — solo estos tokens.
    ══════════════════════════════════════════════════════ */
+
+/* ── DARK (default) ── */
+:root {
+  --r:  14px;
+  --r2: 10px;
+  --bg:        #0a0f1a;
+  --surface:   #0f1729;
+  --surface2:  #162038;
+  --surface3:  #1c2a4a;
+  --border:    #1e3356;
+  --border2:   #2a4472;
+  --text:      #e2eaf8;
+  --text1:     #e2eaf8;
+  --text2:     #8ba3cc;
+  --text3:     #4d6899;
+  --accent:    #f0c040;
+  --accent2:   #e8a820;
+  --gold:      #f0c040;
+  --red:       #ff5572;
+  --green:     #2dd4a0;
+  --blue:      #4da6ff;
+  --purple:    #b084fc;
+  --teal:      #34d4c8;
+  --orange:    #ff8c42;
+  --pink:      #ff6eb4;
+  --al:        #7c6af7;
+  --al2:       #a594ff;
+  --fi:        #22d3ee;
+  --fi2:       #67e8f9;
+  --ca:        #10b981;
+  --ca2:       #34d399;
+  --ca3:       #6ee7b7;
+  --mat-accent: #7c6af7;
+  --ineq-accent:#f472b6;
+  /* Canvas */
+  --canvas-origin: #c8d8f0;
+  --canvas-origin-dot: #0a0f1a;
+  --canvas-grid:   rgba(30,51,90,.4);
+  --canvas-bg0:    #0d1628;
+  --canvas-bg1:    #060a10;
+}
+
+/* ── LIGHT GIRLY — el rosa ES el neutro ── */
 [data-theme="light"] {
-  /* ── Base ── */
-  --bg:       #fff5f8;
-  --surface:  #fdeef3;
-  --surface2: #f8dde8;
-  --surface3: #f0ccd8;
-  --border:   #e8b8cc;
-  --border2:  #d898b8;
-
-  /* ── Texto en borgoña — femenino, no negro ── */
-  --text:     #3d1a28;
-  --text1:    #3d1a28;
-  --text2:    #7a3a54;
-  --text3:    #b87898;
-
-  /* ── Acento global = rosa FÍS ── */
-  --accent:   #d83870;
-  --accent2:  #b02858;
-  --gold:     #d4b800;
-
-  /* ── Semánticos adaptados ── */
-  --red:      #c02040;
-  --green:    #286848;
-  --blue:     #2858a8;
-  --purple:   #7040b8;
-  --teal:     #207878;
-  --orange:   #c06820;
-  --pink:     #d83870;
-
-  /* ── Módulo AL — amarillo brillante (contrasta sobre rosa) ── */
-  --al:       #b89800;
-  --al2:      #d4b400;
-
-  /* ── Módulo FÍS — rosa protagonista ── */
-  --fi:       #d83870;
-  --fi2:      #f06090;
-
-  /* ── Módulo CAL — melocotón-miel ── */
-  --ca:       #c07038;
-  --ca2:      #d89050;
-  --ca3:      #e8b070;
-
-  /* ── Overrides de módulos ── */
-  --mat-accent:  #b89800;
-  --ineq-accent: #d83870;
+  --bg:        #fff5f8;
+  --surface:   #fdeef3;
+  --surface2:  #f8dde8;
+  --surface3:  #f0ccd8;
+  --border:    #e8b8cc;
+  --border2:   #d898b8;
+  --text:      #3d1a28;
+  --text1:     #3d1a28;
+  --text2:     #7a3a54;
+  --text3:     #b87898;
+  --accent:    #d83870;
+  --accent2:   #b02858;
+  --gold:      #d4b800;
+  --red:       #c02040;
+  --green:     #286848;
+  --blue:      #2858a8;
+  --purple:    #7040b8;
+  --teal:      #207878;
+  --orange:    #c06820;
+  --pink:      #d83870;
+  --al:        #b89800;
+  --al2:       #d4b400;
+  --fi:        #d83870;
+  --fi2:       #f06090;
+  --ca:        #c07038;
+  --ca2:       #d89050;
+  --ca3:       #e8b070;
+  --mat-accent: #b89800;
+  --ineq-accent:#d83870;
+  /* Canvas */
+  --canvas-origin:     #d83870;
+  --canvas-origin-dot: #fff5f8;
+  --canvas-grid:       rgba(232,184,204,.5);
+  --canvas-bg0:        #fdeef3;
+  --canvas-bg1:        #fff5f8;
 }
 
-/* ── body en light ── */
-[data-theme="light"] body {
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* ── Canvas de fórmulas: blend multiply sobre fondo rosa ── */
+/* ── Canvas fondo en light — fórmulas con blend ── */
 [data-theme="light"] #sc-bg-canvas {
-  opacity: 0.22;
+  opacity: .22;
   mix-blend-mode: multiply;
 }
-
-/* ── Grain: más sutil en light ── */
 [data-theme="light"] body::after { opacity: .015; }
 
-/* ── Logo Ω ── */
-[data-theme="light"] .sc-logo-name { color: #3d1a28; }
+/* ── Logo en light — el nombre usa el rosa ── */
+[data-theme="light"] .sc-logo-name { color: var(--text); }
 [data-theme="light"] .sc-logo-name .hi { color: var(--fi); }
-[data-theme="light"] .sc-logo-sub { color: var(--text3); }
-[data-theme="light"] .sc-logo-ver { color: var(--text3); }
 [data-theme="light"] #sc-omega-logo {
   filter: drop-shadow(0 0 18px rgba(216,56,112,.4));
 }
@@ -1470,288 +1462,80 @@ body::after {
   background: radial-gradient(circle, rgba(216,56,112,.16) 0%, transparent 70%);
 }
 
-/* ── Cards del launcher ── */
-[data-theme="light"] .lmod-card {
-  background: #ffffff;
-  border-color: var(--border);
-  box-shadow: 0 2px 12px rgba(216,56,112,.07);
-}
-[data-theme="light"] .lmod-name { color: var(--text); }
+/* ── Cards launcher en light — fondo blanco puro ── */
+[data-theme="light"] .lmod-card { background: #ffffff; }
 
-[data-theme="light"] .lmod-card.al:hover {
-  border-color: rgba(184,152,0,.6);
-  box-shadow: 0 10px 40px rgba(184,152,0,.18), 0 0 0 1px rgba(184,152,0,.12) inset;
+/* ══════════════════════════════════════════════════════
+   SWITCH DE TEMA — base CSS (dark + light)
+   ══════════════════════════════════════════════════════ */
+.theme-switch-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  animation: sub-fade .6s ease .8s both;
+  position: relative;
+  z-index: 20;
 }
-[data-theme="light"] .lmod-card.fi:hover {
-  border-color: rgba(216,56,112,.6);
-  box-shadow: 0 10px 40px rgba(216,56,112,.22), 0 0 0 1px rgba(216,56,112,.15) inset;
+.theme-switch-lbl {
+  font-size: 15px;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  transition: opacity .25s;
 }
-[data-theme="light"] .lmod-card.ca:hover {
-  border-color: rgba(192,112,56,.6);
-  box-shadow: 0 10px 40px rgba(192,112,56,.18), 0 0 0 1px rgba(192,112,56,.12) inset;
-}
+#theme-lbl-dark  { opacity: 1; }
+#theme-lbl-light { opacity: .35; }
+[data-theme="light"] #theme-lbl-dark  { opacity: .35; }
+[data-theme="light"] #theme-lbl-light { opacity: 1; }
 
-/* Badges */
-[data-theme="light"] .lmod-badge.al {
-  background: rgba(184,152,0,.12); color: #806800;
-  border-color: rgba(184,152,0,.3);
+/* Track */
+.theme-switch-track {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: background .25s, border-color .25s;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  flex-shrink: 0;
 }
-[data-theme="light"] .lmod-badge.fi {
-  background: rgba(216,56,112,.1); color: #b02858;
-  border-color: rgba(216,56,112,.3);
+.theme-switch-track:hover {
+  border-color: var(--al2);
+  background: var(--surface3);
 }
-[data-theme="light"] .lmod-badge.ca {
-  background: rgba(192,112,56,.1); color: #905028;
-  border-color: rgba(192,112,56,.25);
-}
-
-/* Iconos hover */
-[data-theme="light"] .lmod-card.al:hover .lmod-icon { filter: drop-shadow(0 0 8px rgba(184,152,0,.7)); }
-[data-theme="light"] .lmod-card.fi:hover .lmod-icon { filter: drop-shadow(0 0 8px rgba(216,56,112,.7)); }
-[data-theme="light"] .lmod-card.ca:hover .lmod-icon { filter: drop-shadow(0 0 8px rgba(192,112,56,.7)); }
-
-/* Ripple :active */
-[data-theme="light"] .lmod-card.al:active { box-shadow: 0 0 0 3px rgba(184,152,0,.25); }
-[data-theme="light"] .lmod-card.fi:active { box-shadow: 0 0 0 3px rgba(216,56,112,.28); }
-[data-theme="light"] .lmod-card.ca:active { box-shadow: 0 0 0 3px rgba(192,112,56,.22); }
-
-/* ── Header de módulos ── */
-[data-theme="light"] header {
-  background: var(--surface);
-  border-bottom-color: var(--border);
-}
-[data-theme="light"] .mod-back {
-  background: rgba(216,56,112,.06);
-  border-color: var(--border);
-  color: var(--text2);
-}
-[data-theme="light"] .mod-back.al { color: var(--al); }
-[data-theme="light"] .mod-back.al:hover {
-  border-color: var(--al); background: rgba(184,152,0,.1);
+.theme-switch-track:focus-visible {
+  box-shadow: 0 0 0 2px var(--al);
 }
 
-/* ── Canvas vectores ── */
-[data-theme="light"] #cw { background: #fdeef3; }
-
-/* ── Panel lateral ── */
-[data-theme="light"] #bottom {
-  background: var(--surface);
-  border-color: var(--border);
-}
-[data-theme="light"] .tabs { background: var(--surface2); }
-[data-theme="light"] .tab { color: var(--text3); }
-[data-theme="light"] .tab.on {
-  color: var(--fi); border-bottom-color: var(--fi);
-  background: var(--surface);
-}
-[data-theme="light"] .vec-card {
-  background: #ffffff;
-  border-color: var(--border);
-}
-[data-theme="light"] .vec-inputs { background: var(--surface); }
-[data-theme="light"] .inp-group input {
-  background: #ffffff;
-  border-color: var(--border);
-  color: var(--text);
-}
-[data-theme="light"] .inp-group input:focus {
-  border-color: var(--fi) !important;
-  background: rgba(216,56,112,.04) !important;
-  box-shadow: 0 0 0 2px rgba(216,56,112,.15);
-}
-[data-theme="light"] input[type="number"]:focus,
-[data-theme="light"] input[type="text"]:focus {
-  border-color: var(--fi) !important;
-  background: rgba(216,56,112,.04) !important;
-  box-shadow: 0 0 0 2px rgba(216,56,112,.15);
-  caret-color: var(--fi);
-}
-
-/* ── Botones ── */
-[data-theme="light"] .action-btn {
-  background: rgba(216,56,112,.1);
-  border-color: rgba(216,56,112,.3);
-  color: var(--fi);
-}
-[data-theme="light"] .action-btn:hover {
-  background: rgba(216,56,112,.18);
-}
-[data-theme="light"] .add-vec-btn {
-  border-color: var(--border2);
-  color: var(--text3);
-}
-[data-theme="light"] .add-vec-btn:hover {
-  border-color: var(--fi); color: var(--fi);
-  background: rgba(216,56,112,.05);
-}
-
-/* ── Badges ── */
-[data-theme="light"] .badge-on {
-  color: var(--green);
-  border-color: rgba(40,104,72,.4);
-  background: rgba(40,104,72,.08);
-}
-[data-theme="light"] .badge-off { color: var(--text3); border-color: var(--border); }
-[data-theme="light"] .badge-del { color: var(--red); }
-
-/* ── Op buttons ── */
-[data-theme="light"] .ops-vec-btn {
-  background: var(--surface2); border-color: var(--border); color: var(--text2);
-}
-[data-theme="light"] .op-btn {
-  background: var(--surface2); border-color: var(--border); color: var(--text2);
-}
-[data-theme="light"] .op-btn.on {
-  background: rgba(216,56,112,.12);
-  border-color: var(--fi); color: var(--fi);
-}
-
-/* ── Math cards y resultados ── */
-[data-theme="light"] .math-card { background: var(--surface2); border-color: var(--border); }
-[data-theme="light"] .math-value { color: var(--text); }
-[data-theme="light"] .math-label { color: var(--text3); }
-[data-theme="light"] .math-hint  { color: var(--green); }
-[data-theme="light"] .math-steps-body { border-top-color: var(--border); }
-[data-theme="light"] .math-step-line  { color: var(--text2); }
-[data-theme="light"] .section-title   { color: var(--text3); border-bottom-color: var(--border); }
-[data-theme="light"] .collapsible-header { border-bottom-color: var(--border); }
-[data-theme="light"] .result-box  { background: var(--surface2); border-color: var(--border); }
-[data-theme="light"] .result-val  { color: var(--fi); }
-[data-theme="light"] .result-sub  { color: var(--text3); }
-[data-theme="light"] .result-title { color: var(--text3); }
-[data-theme="light"] .error-box   { background: rgba(192,32,64,.06); border-color: rgba(192,32,64,.2); }
-[data-theme="light"] .solve-result { background: rgba(192,112,56,.06); border-color: rgba(192,112,56,.2); }
-[data-theme="light"] .solve-title  { color: var(--ca); }
-[data-theme="light"] .solve-step   { color: var(--text2); }
-[data-theme="light"] .solve-final  { color: var(--ca); }
-
-/* ── Legend ── */
-[data-theme="light"] .leg-item { background: rgba(255,255,255,.9); }
-[data-theme="light"] .leg-text { color: var(--text2); }
-
-/* ── Solver inputs ── */
-[data-theme="light"] .eq-input {
-  background: #ffffff; border-color: var(--border); color: var(--text);
-}
-[data-theme="light"] .eq-input:focus { border-color: var(--fi); }
-[data-theme="light"] .solver-desc { color: var(--text3); border-left-color: var(--fi); }
-[data-theme="light"] .unk-comp { background: #ffffff; border-color: var(--border); color: var(--text); }
-[data-theme="light"] .unk-result-box { background: rgba(192,112,56,.06); border-color: rgba(192,112,56,.2); }
-[data-theme="light"] .unk-result-title { color: var(--ca); }
-[data-theme="light"] .unk-result-val   { color: var(--ca); }
-
-/* ── Panel inner ── */
-[data-theme="light"] .panel-inner { background: var(--surface); }
-[data-theme="light"] .panel-desc  { color: var(--text3); }
-[data-theme="light"] .panel-label { color: var(--text2); }
-[data-theme="light"] .panel-label.al { color: var(--al); }
-[data-theme="light"] .panel-label.ca { color: var(--ca); }
-
-/* ── Módulos internos ── */
-[data-theme="light"] #em-app,
-[data-theme="light"] #mat-app,
-[data-theme="light"] #ineq-app,
-[data-theme="light"] #calc-app,
-[data-theme="light"] #seq-app { background: var(--bg); }
-
-[data-theme="light"] .em-header     { background: var(--surface); border-bottom-color: var(--border); }
-[data-theme="light"] #em-cw         { background: var(--surface2); }
-[data-theme="light"] .em-panel-area { background: var(--surface); border-left-color: var(--border); }
-[data-theme="light"] .em-tabs       { background: var(--surface2); }
-[data-theme="light"] .em-tab        { color: var(--text3); }
-[data-theme="light"] .em-tab.on     { color: var(--fi); border-bottom-color: var(--fi); }
-[data-theme="light"] .em-panel      { background: var(--surface); }
-
-[data-theme="light"] .mat-panel  { background: var(--surface); }
-[data-theme="light"] .mat-body   { background: var(--bg); }
-[data-theme="light"] .mat-inp    { background: #ffffff; border-color: var(--border); color: var(--text); }
-[data-theme="light"] .mat-cell   { background: var(--surface2); border-color: var(--border); color: var(--text); }
-[data-theme="light"] .mat-res-box { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .mat-tab    { color: var(--text3); }
-[data-theme="light"] .mat-tab.on { color: var(--al); border-bottom-color: var(--al); }
-
-[data-theme="light"] .ineq-pick       { background: var(--bg); }
-[data-theme="light"] .ineq-type-card  { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .ineq-type-name  { color: var(--text); }
-[data-theme="light"] .ineq-type-desc  { color: var(--text3); }
-[data-theme="light"] .ineq-solver-body { background: var(--surface); }
-
-[data-theme="light"] .calc-body  { background: var(--bg); }
-[data-theme="light"] .calc-tabs  { background: var(--surface2); }
-[data-theme="light"] .calc-tab   { color: var(--text3); }
-[data-theme="light"] .calc-tab.on { color: var(--ca); border-bottom-color: var(--ca); }
-[data-theme="light"] .calc-scroll { background: var(--bg); }
-[data-theme="light"] .calc-card  { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .calc-card-name { color: var(--text); }
-[data-theme="light"] .calc-card-desc { color: var(--text3); }
-[data-theme="light"] .calc-inp   { background: #ffffff; border-color: var(--border); color: var(--text); }
-[data-theme="light"] .calc-res-box { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .calc-res-val  { color: var(--ca); }
-[data-theme="light"] .calc-step     { color: var(--text2); }
-[data-theme="light"] .calc-err      { color: var(--red); }
-[data-theme="light"] .calc-hint     { color: var(--text3); background: var(--surface2); }
-
-/* ── Graficador ── */
-[data-theme="light"] .graf-canvas-wrap   { border-color: var(--border); background: #fff; }
-[data-theme="light"] .graf-table-wrap    { border-color: var(--border); }
-[data-theme="light"] .graf-table-title   { background: rgba(216,56,112,.08); color: var(--fi); border-color: var(--border); }
-[data-theme="light"] .graf-result-table th { background: rgba(216,56,112,.06); color: var(--fi); border-color: var(--border); }
-[data-theme="light"] .graf-result-table td { border-color: rgba(232,176,204,.5); color: var(--text); }
-[data-theme="light"] .graf-result-table tr.zero-row td { color: var(--fi); background: rgba(216,56,112,.06); }
-[data-theme="light"] .graf-step-block    { background: var(--surface2); border-left-color: var(--ca); }
-[data-theme="light"] .gs-header          { color: var(--ca); }
-[data-theme="light"] .graf-type-card     { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .graf-type-card:hover { border-color: rgba(216,56,112,.4); }
-[data-theme="light"] .graf-type-card.sel  { border-color: var(--fi); background: rgba(216,56,112,.08); }
-[data-theme="light"] .graf-type-name     { color: var(--text); }
-[data-theme="light"] .graf-inputs        { background: var(--surface); border-color: var(--border); }
-[data-theme="light"] .graf-coef         { background: #ffffff; border-color: var(--border); color: var(--text); }
-[data-theme="light"] .graf-coef:focus   { border-color: var(--fi) !important; }
-[data-theme="light"] .graf-formula-preview { background: var(--surface2); border-color: rgba(216,56,112,.2); color: var(--fi); }
-
-/* ── Submodule screen ── */
-[data-theme="light"] #submod-screen { background: var(--bg); }
-[data-theme="light"] .submod-back   { background: rgba(216,56,112,.06); border-color: var(--border); color: var(--text2); }
-[data-theme="light"] .submod-card   { background: #ffffff; border-color: var(--border); }
-[data-theme="light"] .submod-name   { color: var(--text); }
-[data-theme="light"] .submod-desc   { color: var(--text3); }
-[data-theme="light"] .submod-card.al-sub:hover { border-color: rgba(184,152,0,.4); }
-[data-theme="light"] .submod-card.fi-sub:hover { border-color: rgba(216,56,112,.4); }
-[data-theme="light"] .submod-card.ca-sub:hover { border-color: rgba(192,112,56,.4); }
-
-/* ── Toast ── */
-[data-theme="light"] .sc-toast {
-  background: var(--surface);
-  border-color: var(--border2);
-  color: var(--text);
-  box-shadow: 0 4px 24px rgba(216,56,112,.1);
-}
-[data-theme="light"] .sc-toast.sc-toast-warn { border-color: rgba(192,104,0,.4); color: var(--ca); }
-[data-theme="light"] .sc-toast.sc-toast-error { border-color: rgba(192,32,64,.4); color: var(--red); }
-[data-theme="light"] .sc-toast.sc-toast-ok    { border-color: rgba(40,104,72,.4); color: var(--green); }
-
-/* ── Switch ── */
-[data-theme="light"] .theme-switch-track {
-  background: rgba(216,56,112,.18);
-  border-color: rgba(216,56,112,.4);
-}
-[data-theme="light"] .theme-switch-track:hover {
-  background: rgba(216,56,112,.28);
+/* Knob — dark: izquierda, light: derecha */
+.theme-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--al2);
+  box-shadow: 0 1px 6px rgba(0,0,0,.35);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), background .25s;
+  pointer-events: none;
+  display: block;
 }
 [data-theme="light"] .theme-switch-knob {
   transform: translateX(24px);
   background: var(--fi);
-  box-shadow: 0 1px 6px rgba(216,56,112,.3);
+  box-shadow: 0 1px 8px rgba(216,56,112,.4);
 }
-
-/* ── Emoji labels switch ── */
-[data-theme="light"] #theme-lbl-dark  { opacity: .3; }
-[data-theme="light"] #theme-lbl-light { opacity: 1; }
-
-/* ── Author footer ── */
-[data-theme="light"] #sc-author-footer { color: var(--text3); }
-
-/* ── Install banner ── */
-[data-theme="light"] .install-banner-ui { background: var(--surface); border-top-color: var(--fi); }
-[data-theme="light"] .install-banner-text { color: var(--text); }
-[data-theme="light"] .install-banner-text span { color: var(--fi); }
+[data-theme="light"] .theme-switch-track {
+  border-color: rgba(216,56,112,.5);
+  background: rgba(216,56,112,.12);
+}
+[data-theme="light"] .theme-switch-track:hover {
+  background: rgba(216,56,112,.22);
+}

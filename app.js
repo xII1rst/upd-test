@@ -484,7 +484,8 @@ function cssVar(name){
 // Colores de canvas pre-cacheados — se actualizan al cambiar tema
 let _canvasColors = {};
 function refreshCanvasColors(){
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  // Lee las variables --canvas-* que se definen en :root y [data-theme="light"]
+  // Esto hace que el canvas respete el tema sin lógica condicional aquí
   _canvasColors = {
     bg:        cssVar('--bg'),
     surface:   cssVar('--surface'),
@@ -492,11 +493,11 @@ function refreshCanvasColors(){
     border:    cssVar('--border'),
     text:      cssVar('--text'),
     text3:     cssVar('--text3'),
-    // En light: punto de origen visible sobre fondo rosado
-    origin:    isLight ? '#d83870' : '#c8d8f0',
-    originDot: cssVar('--bg'),
-    // Grid del graficador
-    gridLine:  isLight ? 'rgba(232,184,204,0.5)' : cssVar('--border'),
+    origin:    cssVar('--canvas-origin'),
+    originDot: cssVar('--canvas-origin-dot'),
+    gridLine:  cssVar('--canvas-grid'),
+    canvasBg0: cssVar('--canvas-bg0'),
+    canvasBg1: cssVar('--canvas-bg1'),
   };
 }
 // Inicializar y re-cachear al cambiar tema
@@ -1113,7 +1114,7 @@ function draw(){
   ctx.clearRect(0,0,W,H);
   // Background gradient
   const bg=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.8);
-  bg.addColorStop(0,_canvasColors.surface||'#0d1628');bg.addColorStop(1,_canvasColors.bg||'#060a10');
+  bg.addColorStop(0,_canvasColors.canvasBg0||'#0d1628');bg.addColorStop(1,_canvasColors.canvasBg1||'#060a10');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
   // ── GRID DE REFERENCIA — líneas de cuadrícula (sin dots, solo líneas suaves) ──
@@ -3256,12 +3257,12 @@ function drawNumLine(points, solutionLabels) {
   const lo=ctr-span/2, hi=ctr+span/2;
   const toX=v=>16+(v-lo)/(hi-lo)*(W-32);
   const ay=38;
-  ctx.strokeStyle='#1e2d45'; ctx.lineWidth=2; ctx.beginPath();
+  ctx.strokeStyle=_canvasColors.gridLine||'#1e2d45'; ctx.lineWidth=2; ctx.beginPath();
   ctx.moveTo(12,ay); ctx.lineTo(W-12,ay); ctx.stroke();
   ctx.fillStyle='#3a5a7a'; ctx.font='10px Space Mono'; ctx.textAlign='center';
   for(let v=Math.ceil(lo);v<=Math.floor(hi);v++){
     const x=toX(v);
-    ctx.strokeStyle='#1e2d45'; ctx.lineWidth=1; ctx.beginPath();
+    ctx.strokeStyle=_canvasColors.gridLine||'#1e2d45'; ctx.lineWidth=1; ctx.beginPath();
     ctx.moveTo(x,ay-4); ctx.lineTo(x,ay+4); ctx.stroke();
     if((hi-lo)<20) ctx.fillText(v,x,ay+16);
   }
