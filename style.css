@@ -399,8 +399,8 @@ canvas:active{cursor:grabbing}
   cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;white-space:nowrap;
 }
 .em-tab.on{color:var(--fi);border-bottom-color:var(--fi);background:var(--surface)}
-.em-panel{display:none;padding:12px 14px 16px;overflow-y:auto;flex:1;min-height:0}
-.em-panel.on{display:flex;flex-direction:column}
+.em-panel{display:none;padding:12px 14px 16px;overflow-y:auto}
+.em-panel.on{display:block}
 /* EM cards — accent overrides usando --fi (física) */
 .em-card.active{border-color:var(--fi2);}
 .em-card .calc-card-header:hover{background:rgba(var(--fi-rgb),.04);}
