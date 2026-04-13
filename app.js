@@ -330,6 +330,14 @@ function dismissInstall(){const b=document.getElementById('install-banner');if(b
   const b=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);
   document.head.appendChild(l);
+  // Favicon — reutiliza el mismo ícono Ω del manifest
+  const fav=document.createElement('link');
+  fav.rel='icon'; fav.type='image/png'; fav.href=icon;
+  document.head.appendChild(fav);
+  // Apple touch icon
+  const atl=document.createElement('link');
+  atl.rel='apple-touch-icon'; atl.href=icon;
+  document.head.appendChild(atl);
 })();
 
 
