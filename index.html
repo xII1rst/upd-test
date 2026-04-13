@@ -16,7 +16,7 @@
   <div class="sc-logo" style="position:relative">
     <svg id="sc-omega-logo" width="120" height="120" viewBox="-105 -105 210 210"
       fill="none" xmlns="http://www.w3.org/2000/svg"
-      style="overflow:visible;filter:drop-shadow(0 0 28px rgba(124,106,247,.35))">
+      style="overflow:visible">
       <defs>
         <radialGradient id="gOmega" cx="50%" cy="35%" r="65%">
           <stop offset="0%"   stop-color="#ede9fe"/>
@@ -100,20 +100,15 @@
     </div>
   </div>
 
-  <!-- ── Theme switch ── -->
-  <div class="theme-switch-wrap" id="theme-switch-wrap">
+  <!-- THEME SWITCH -->
+  <div class="theme-switch-wrap">
     <span class="theme-switch-lbl" id="theme-lbl-dark">🌙</span>
-    <button
-      class="theme-switch-track"
-      id="theme-switch"
-      onclick="toggleTheme()"
-      role="switch"
-      aria-checked="false"
-      aria-label="Cambiar tema"
-    >
+    <button class="theme-switch-track" id="theme-switch"
+      role="switch" aria-label="Cambiar tema" aria-checked="false"
+      onclick="toggleTheme()">
       <span class="theme-switch-knob" id="theme-knob"></span>
     </button>
-    <span class="theme-switch-lbl" id="theme-lbl-light">☀️</span>
+    <span class="theme-switch-lbl" id="theme-lbl-light">🌸</span>
   </div>
 
 </div>
@@ -191,29 +186,29 @@
         <p class="panel-desc">Ingresa las coordenadas de los 3 vértices.<br>Se calcularán lados, ángulos internos y se graficará.</p>
 
         <div class="panel-group">
-          <div class="panel-label" style="color:#f0c040">Punto P</div>
+          <div class="panel-label" style="color:var(--gold)">Punto P</div>
           <div class="inp-row">
-            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-px" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-py" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-pz" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--red)">X</label><input type="number" id="tri-px" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--green)">Y</label><input type="number" id="tri-py" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--blue)">Z</label><input type="number" id="tri-pz" value="0" onfocus="this.select()"/></div>
           </div>
         </div>
 
         <div class="panel-group">
-          <div class="panel-label" style="color:#4da6ff">Punto Q</div>
+          <div class="panel-label" style="color:var(--blue)">Punto Q</div>
           <div class="inp-row">
-            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-qx" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-qy" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-qz" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--red)">X</label><input type="number" id="tri-qx" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--green)">Y</label><input type="number" id="tri-qy" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--blue)">Z</label><input type="number" id="tri-qz" value="0" onfocus="this.select()"/></div>
           </div>
         </div>
 
         <div class="panel-group">
-          <div class="panel-label" style="color:#2dd4a0">Punto R</div>
+          <div class="panel-label" style="color:var(--green)">Punto R</div>
           <div class="inp-row">
-            <div class="inp-group"><label style="color:#ff5572">X</label><input type="number" id="tri-rx" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#2dd4a0">Y</label><input type="number" id="tri-ry" value="0" onfocus="this.select()"/></div>
-            <div class="inp-group"><label style="color:#4da6ff">Z</label><input type="number" id="tri-rz" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--red)">X</label><input type="number" id="tri-rx" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--green)">Y</label><input type="number" id="tri-ry" value="0" onfocus="this.select()"/></div>
+            <div class="inp-group"><label style="color:var(--blue)">Z</label><input type="number" id="tri-rz" value="0" onfocus="this.select()"/></div>
           </div>
         </div>
 
@@ -281,11 +276,11 @@
       <button id="em-cyl" onclick="emSetCoord('cyl')">CIL</button>
       <button id="em-sph" onclick="emSetCoord('sph')">ESF</button>
     </div>
-    <button id="em-fig-btn" onclick="emFigToggle()" style="background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.25);border-radius:8px;color:#a594ff;font-size:10px;font-family:'Space Mono',monospace;padding:5px 10px;cursor:pointer;letter-spacing:.04em;transition:all .2s">⬡ Figura</button>
+    <button id="em-fig-btn" onclick="emFigToggle()" style="background:rgba(var(--al-rgb),.1);border:1px solid rgba(var(--al-rgb),.25);border-radius:8px;color:var(--al2);font-size:10px;font-family:'Space Mono',monospace;padding:5px 10px;cursor:pointer;letter-spacing:.04em;transition:all .2s">⬡ Figura</button>
   </div>
 
   <!-- Panel flotante de figuras EM -->
-  <div id="em-fig-panel" style="display:none;position:absolute;top:52px;right:10px;z-index:30;background:#0d1220;border:1px solid #1e2d45;border-radius:12px;padding:14px;width:210px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+  <div id="em-fig-panel" style="display:none;position:absolute;top:52px;right:10px;z-index:30;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px;width:210px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
     <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--al2);margin-bottom:8px">Figura Geométrica</div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
       <button class="em-fig-type-btn on" onclick="emFigSetType('sphere')">Esfera</button>
@@ -309,7 +304,7 @@
   <div id="em-cw">
     <canvas id="em-canvas"></canvas>
     <div id="em-legend-canvas"></div>
-    <button id="btn-em-reset" onclick="emResetView()" style="position:absolute;top:10px;right:10px;background:rgba(10,15,26,.85);border:1px solid #1e3356;border-radius:8px;color:#8ba3cc;font-size:11px;font-family:Space Mono,monospace;padding:6px 12px;cursor:pointer;letter-spacing:.04em;transition:all .2s">↺ Reset</button>
+    <button id="btn-em-reset" onclick="emResetView()" style="position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:11px;font-family:Space Mono,monospace;padding:6px 12px;cursor:pointer;letter-spacing:.04em;transition:all .2s">↺ Reset</button>
   </div>
 
   <div class="em-panel-tog-wrap">
@@ -466,9 +461,9 @@
   </div>
   <!-- SOLVER -->
   <div id="ineq-solver" class="ineq-solver">
-    <div class="mod-header" style="background:#111827;border-top:1px solid #1e2d45;border-bottom:1px solid #1e2d45;padding:8px 14px;">
+    <div class="mod-header" style="background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 14px;">
       <button class="ineq-btn sec" onclick="ineqBack()" style="font-size:10px;padding:5px 10px;">← Tipos</button>
-      <span id="ineq-solver-title" style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#f472b6;margin-left:8px;"></span>
+      <span id="ineq-solver-title" style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--ineq-accent);margin-left:8px;"></span>
     </div>
     <div class="ineq-solver-body" id="ineq-solver-body"></div>
   </div>
