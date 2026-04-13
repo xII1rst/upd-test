@@ -2270,15 +2270,18 @@ function openSubmod(parent) {
   const cfg = SUBMOD_CONFIG[parent];
   document.getElementById('submod-title').innerHTML = cfg.title;
   const cardsEl = document.getElementById('submod-cards');
-  cardsEl.innerHTML = cfg.cards.map(c => `
-    <div class="submod-card ${c.cls} ${c.disabled?'disabled':''}" onclick="${c.disabled ? '' : `launchSubmod('${c.id}')`}" style="${c.disabled?'opacity:.4;cursor:default':''}">
+  cardsEl.innerHTML = cfg.cards.map(c => {
+    const oc = c.disabled ? '' : 'onclick="launchSubmod(\'' + c.id + '\')"';
+    return `
+    <div class="submod-card ${c.cls} ${c.disabled?'disabled':''}" ${oc} style="${c.disabled?'opacity:.4;cursor:default':''}">
       <div class="submod-icon">${c.icon}</div>
       <div class="submod-info">
         <div class="submod-name">${c.name}</div>
         <div class="submod-desc">${c.desc}</div>
       </div>
       <div class="submod-arrow">${c.disabled?'':'›'}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   const launcher = document.getElementById('launcher');
   launcher.classList.add('hidden');
   setTimeout(() => {
