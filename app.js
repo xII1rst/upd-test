@@ -1107,10 +1107,10 @@ function drawAxisTicks3(o,dir,col,axLen,s,cx,cy,fn3){
     const lbl=String(v);
     const nx=pp.sx+11,ny=pp.sy+11;
     ctx.font='bold 11px Space Mono';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.globalAlpha=.6;ctx.fillStyle='#060a10';ctx.fillRect(nx-9,ny-7,18,14);
+    ctx.globalAlpha=.6;ctx.fillStyle=_canvasColors.canvasBg1||'#060a10';ctx.fillRect(nx-9,ny-7,18,14);
     ctx.globalAlpha=1;ctx.fillStyle=col;ctx.fillText(lbl,nx,ny);
     const nnx=pn.sx+11,nny=pn.sy+11;
-    ctx.globalAlpha=.25;ctx.fillStyle='#060a10';ctx.fillRect(nnx-11,nny-7,22,14);
+    ctx.globalAlpha=.25;ctx.fillStyle=_canvasColors.canvasBg1||'#060a10';ctx.fillRect(nnx-11,nny-7,22,14);
     ctx.globalAlpha=.4;ctx.fillStyle=col;ctx.fillText('-'+lbl,nnx,nny);
   }
   ctx.globalAlpha=1;
@@ -1126,10 +1126,10 @@ function drawAxisTicks2(o,isX,col,axLen,s,cx,cy){
     const lbl=String(v);
     const nx=pp.sx+(isX?0:-16), ny=pp.sy+(isX?14:0);
     ctx.font='bold 12px Space Mono';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.globalAlpha=.6;ctx.fillStyle='#060a10';ctx.fillRect(nx-10,ny-8,20,16);
+    ctx.globalAlpha=.6;ctx.fillStyle=_canvasColors.canvasBg1||'#060a10';ctx.fillRect(nx-10,ny-8,20,16);
     ctx.globalAlpha=1;ctx.fillStyle=col;ctx.fillText(lbl,nx,ny);
     const nnx=pn.sx+(isX?0:-20), nny=pn.sy+(isX?14:0);
-    ctx.globalAlpha=.25;ctx.fillStyle='#060a10';ctx.fillRect(nnx-12,nny-8,24,16);
+    ctx.globalAlpha=.25;ctx.fillStyle=_canvasColors.canvasBg1||'#060a10';ctx.fillRect(nnx-12,nny-8,24,16);
     ctx.globalAlpha=.45;ctx.fillStyle=col;ctx.fillText('-'+lbl,nnx,nny);
   }
   ctx.globalAlpha=1;
@@ -1161,7 +1161,7 @@ function draw(){
     // Plano XZ (suelo) — cuadrícula horizontal de referencia
     const gridStep=adaptiveStep(axLen);
     ctx.save();
-    ctx.strokeStyle='rgba(40,65,110,0.22)';ctx.lineWidth=0.6;ctx.globalAlpha=1;
+    ctx.strokeStyle=_canvasColors.gridLine||'rgba(40,65,110,0.22)';ctx.lineWidth=0.6;ctx.globalAlpha=1;
     for(let v=-Math.floor(axLen);v<=Math.floor(axLen);v+=gridStep){
       // Líneas paralelas al eje X en el plano Y=0
       const a=p3(-axLen,0,v,cx,cy,s), b=p3(axLen,0,v,cx,cy,s);
@@ -1175,7 +1175,7 @@ function draw(){
     // Cuadrícula cartesiana R2 — líneas ortogonales suaves
     const gridStep2=adaptiveStep(axLen);
     ctx.save();
-    ctx.strokeStyle='rgba(30,51,90,0.28)';ctx.lineWidth=0.5;ctx.globalAlpha=1;
+    ctx.strokeStyle=_canvasColors.gridLine||'rgba(30,51,90,0.28)';ctx.lineWidth=0.5;ctx.globalAlpha=1;
     for(let v=-Math.floor(axLen);v<=Math.floor(axLen);v+=gridStep2){
       if(Math.abs(v)<0.001) continue; // los ejes se dibujan solos
       const hL=p2(-axLen,v,cx,cy,s), hR=p2(axLen,v,cx,cy,s);
@@ -1491,7 +1491,7 @@ function emDraw(){
 
   // Background
   const bg=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.8);
-  bg.addColorStop(0,'#0d1628');bg.addColorStop(1,'#060a10');
+  bg.addColorStop(0,_canvasColors.canvasBg0||'#0d1628');bg.addColorStop(1,_canvasColors.canvasBg1||'#060a10');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
   ctx.globalAlpha=1;
@@ -1533,10 +1533,10 @@ function emDraw(){
       ec.globalAlpha=.3;ec.beginPath();ec.arc(tn.sx,tn.sy,2,0,Math.PI*2);ec.fillStyle=col;ec.fill();
       const nx=tp.sx+11,ny=tp.sy+11;
       ec.font='bold 11px Space Mono';ec.textAlign='center';ec.textBaseline='middle';
-      ec.globalAlpha=.6;ec.fillStyle='#060a10';ec.fillRect(nx-9,ny-7,18,14);
+      ec.globalAlpha=.6;ec.fillStyle=_canvasColors.canvasBg1||'#060a10';ec.fillRect(nx-9,ny-7,18,14);
       ec.globalAlpha=1;ec.fillStyle=col;ec.fillText(String(v),nx,ny);
       const nnx=tn.sx+11,nny=tn.sy+11;
-      ec.globalAlpha=.25;ec.fillStyle='#060a10';ec.fillRect(nnx-11,nny-7,22,14);
+      ec.globalAlpha=.25;ec.fillStyle=_canvasColors.canvasBg1||'#060a10';ec.fillRect(nnx-11,nny-7,22,14);
       ec.globalAlpha=.4;ec.fillStyle=col;ec.fillText('-'+String(v),nnx,nny);
     }
     ec.globalAlpha=1;
