@@ -1400,10 +1400,9 @@ body::after {
   --canvas-bg1:        #fff5f8;
 }
 
-/* ── Canvas fondo en light — fórmulas con blend ── */
+/* ── Canvas fondo en light — colores nativos vía JS palette ── */
 [data-theme="light"] #sc-bg-canvas {
-  opacity: .22;
-  mix-blend-mode: multiply;
+  opacity: .45;
 }
 [data-theme="light"] body::after { opacity: .015; }
 

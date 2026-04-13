@@ -54,13 +54,28 @@
     '∞','∫','∂','∇','∑','Π','√','±','≈','≠','∈','∅','ħ','Δ','∮','ℝ','ℂ','ℕ',
   ];
 
-  const COLORS = [
-    'rgba(124,106,247,',
-    'rgba(165,148,255,',
-    'rgba(34,211,238,',
-    'rgba(240,192,64,',
-    'rgba(16,185,129,',
+  const COLORS_DARK = [
+    'rgba(124,106,247,',  // púrpura
+    'rgba(165,148,255,',  // púrpura claro
+    'rgba(34,211,238,',   // cyan
+    'rgba(240,192,64,',   // dorado
+    'rgba(16,185,129,',   // verde
   ];
+  const COLORS_LIGHT = [
+    'rgba(216,56,112,',   // rosa principal
+    'rgba(232,120,152,',  // rosa coral
+    'rgba(184,152,0,',    // dorado cálido
+    'rgba(192,112,56,',   // naranja cálido
+    'rgba(176,40,88,',    // rosa profundo
+  ];
+
+  let currentPalette = COLORS_DARK;
+  function refreshPalette(){
+    currentPalette = document.documentElement.getAttribute('data-theme') === 'light'
+      ? COLORS_LIGHT : COLORS_DARK;
+  }
+  // Exponer para que el theme system lo llame al cambiar tema
+  window.scBgRefreshTheme = refreshPalette;
 
   // Configuración de las 3 capas
   const LAYERS = [
@@ -77,7 +92,7 @@
 
   function rand(min, max){ return min + Math.random() * (max - min); }
   function randFormula(){ return FORMULAS[Math.floor(Math.random() * FORMULAS.length)]; }
-  function randColor(){   return COLORS[Math.floor(Math.random() * COLORS.length)]; }
+  function randColorIdx(){ return Math.floor(Math.random() * COLORS_DARK.length); }
 
   function build(){
     W = window.innerWidth;
@@ -105,7 +120,7 @@
           size,
           opacity: rand(layer.opMin, layer.opMax),
           angle,
-          color:  randColor(),
+          color:  randColorIdx(),
           layer:  li,
           vx: Math.cos(dir) * layer.speedX * speed,
           vy: Math.sin(dir) * layer.speedY * speed,
@@ -116,18 +131,17 @@
 
   function draw(){
     ctx.clearRect(0, 0, W, H);
-    // Dibujar capa 0 con blur (capa de fondo — solo capa 0 usa blur para rendimiento)
     items.forEach(it => {
+      const baseColor = currentPalette[it.color];
       ctx.save();
       ctx.translate(it.x, it.y);
       ctx.rotate(it.angle);
       ctx.font = `${it.size}px "Space Mono", monospace`;
       if(it.layer === 0){
-        // Capa de fondo: simular blur con opacidad reducida (blur real es caro)
         ctx.globalAlpha = it.opacity * 0.6;
-        ctx.fillStyle = it.color + (it.opacity * 0.6) + ')';
+        ctx.fillStyle = baseColor + (it.opacity * 0.6) + ')';
       } else {
-        ctx.fillStyle = it.color + it.opacity + ')';
+        ctx.fillStyle = baseColor + it.opacity + ')';
       }
       ctx.fillText(it.text, 0, 0);
       ctx.restore();
@@ -158,6 +172,8 @@
     resizeTimer = setTimeout(() => { build(); }, 120);
   });
 
+  // Inicializar paleta según tema guardado (si hay) antes del primer build
+  refreshPalette();
   build();
   loop();
 })();
@@ -472,6 +488,8 @@ function applyTheme(theme, animate = true){
   localStorage.setItem('sc-theme', theme);
   // Refresh canvas colors para que el canvas respete el tema
   if(typeof refreshCanvasColors === 'function') refreshCanvasColors();
+  // Refresh background formulas palette
+  if(typeof scBgRefreshTheme === 'function') scBgRefreshTheme();
 
   // Actualizar el meta theme-color del navegador
   const metaTheme = document.querySelector('meta[name="theme-color"]');
