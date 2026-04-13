@@ -453,6 +453,8 @@ function applyTheme(theme, animate = true){
   }
 
   localStorage.setItem('sc-theme', theme);
+  // Refresh canvas colors para que el canvas respete el tema
+  if(typeof refreshCanvasColors === 'function') refreshCanvasColors();
 
   // Actualizar el meta theme-color del navegador
   const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -464,8 +466,41 @@ function applyTheme(theme, animate = true){
 function toggleTheme(){
   const current = document.documentElement.getAttribute('data-theme');
   applyTheme(current === 'light' ? 'dark' : 'light', true);
+  // Actualizar cache de colores del canvas y redibujar
+  setTimeout(() => {
+    refreshCanvasColors();
+    try { draw(); } catch(e){}   // canvas vectores
+    try { emDraw(); } catch(e){} // canvas EM
+  }, 50);
 }
 // ── END THEME SYSTEM ──────────────────────────────────────────────────────
+
+// ── CANVAS COLOR HELPER ──────────────────────────────────────────────────
+// Lee variables CSS en runtime → el canvas respeta el tema activo
+const _root = document.documentElement;
+function cssVar(name){
+  return getComputedStyle(_root).getPropertyValue(name).trim() || name;
+}
+// Colores de canvas pre-cacheados — se actualizan al cambiar tema
+let _canvasColors = {};
+function refreshCanvasColors(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  _canvasColors = {
+    bg:        cssVar('--bg'),
+    surface:   cssVar('--surface'),
+    surface2:  cssVar('--surface2'),
+    border:    cssVar('--border'),
+    text:      cssVar('--text'),
+    text3:     cssVar('--text3'),
+    // En light: punto de origen visible sobre fondo rosado
+    origin:    isLight ? '#d83870' : '#c8d8f0',
+    originDot: cssVar('--bg'),
+    // Grid del graficador
+    gridLine:  isLight ? 'rgba(232,184,204,0.5)' : cssVar('--border'),
+  };
+}
+// Inicializar y re-cachear al cambiar tema
+refreshCanvasColors();
 
 // ── SISTEMA DE NOTIFICACIONES (reemplaza alert()) ────────────────────────
 function scToast(msg, type='info', duration=3200){
@@ -1078,7 +1113,7 @@ function draw(){
   ctx.clearRect(0,0,W,H);
   // Background gradient
   const bg=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.8);
-  bg.addColorStop(0,'#0d1628');bg.addColorStop(1,'#060a10');
+  bg.addColorStop(0,_canvasColors.surface||'#0d1628');bg.addColorStop(1,_canvasColors.bg||'#060a10');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
   // ── GRID DE REFERENCIA — líneas de cuadrícula (sin dots, solo líneas suaves) ──
@@ -1115,8 +1150,8 @@ function draw(){
   if(mode===3){
 
     const o=p3(0,0,0,cx,cy,s);
-    ctx.beginPath();ctx.arc(o.sx,o.sy,6,0,Math.PI*2);ctx.fillStyle='#c8d8f0';ctx.shadowColor='#c8d8f0';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
-ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle='#0a0f1a';ctx.fill();
+    ctx.beginPath();ctx.arc(o.sx,o.sy,6,0,Math.PI*2);const _oc3=_canvasColors.origin;ctx.fillStyle=_oc3;ctx.shadowColor=_oc3;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
+ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.originDot;ctx.fill();
 
     const axes=[
       [[axLen,0,0],[-axLen,0,0],'#ff5572','X',[1,0,0]],
@@ -1182,7 +1217,7 @@ ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle='#0a0f1a';ctx.f
 
     const o=p2(0,0,cx,cy,s);
     ctx.beginPath();ctx.arc(o.sx,o.sy,6,0,Math.PI*2);ctx.fillStyle='#c8d8f0';ctx.shadowColor='#c8d8f0';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
-ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle='#0a0f1a';ctx.fill();
+ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.originDot;ctx.fill();
 
     // Axes R2
     [[[axLen,0],[-axLen,0],'#ff5572','X',true],[[0,axLen],[0,-axLen],'#2dd4a0','Y',false]].forEach(([pos,neg,col,lbl,isX])=>{
@@ -1488,7 +1523,7 @@ function emDraw(){
   // Origin
   const o=emP3(0,0,0);
   ctx.beginPath();ctx.arc(o.sx,o.sy,6,0,Math.PI*2);ctx.fillStyle='#c8d8f0';ctx.shadowColor='#c8d8f0';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
-  ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle='#0a0f1a';ctx.fill();
+  ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.originDot;ctx.fill();
 
   // Draw EM objects
   emObjects.forEach(obj=>{
@@ -3213,7 +3248,7 @@ function drawNumLine(points, solutionLabels) {
   if(!canvas) return;
   const W=canvas.offsetWidth||320; canvas.width=W; canvas.height=72;
   const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#111827'; ctx.fillRect(0,0,W,72);
+  ctx.fillStyle=_canvasColors.surface2||'#111827'; ctx.fillRect(0,0,W,72);
   const vals=points.map(p=>p.val).filter(v=>isFinite(v));
   if(!vals.length) return;
   const ctr=(Math.min(...vals)+Math.max(...vals))/2;
@@ -3237,7 +3272,7 @@ function drawNumLine(points, solutionLabels) {
     ctx.beginPath(); ctx.arc(x,ay,7,0,Math.PI*2);
     ctx.strokeStyle=color; ctx.lineWidth=2;
     if(filled){ ctx.fillStyle=color; ctx.fill(); }
-    else { ctx.fillStyle='#111827'; ctx.fill(); ctx.stroke(); }
+    else { ctx.fillStyle=_canvasColors.surface2||'#111827'; ctx.fill(); ctx.stroke(); }
     ctx.stroke();
     ctx.fillStyle=color; ctx.font='bold 10px Space Mono'; ctx.textAlign='center';
     ctx.fillText(matFmtNum(val),x,ay-14);
