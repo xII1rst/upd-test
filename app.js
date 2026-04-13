@@ -1407,6 +1407,7 @@ let emResult = null;
 function emInit(){
   if(emInitDone) return;
   emInitDone = true;
+  emRenderPanels();
   emCanvas = document.getElementById('em-canvas');
   emCtx = emCanvas.getContext('2d');
   emResizeCanvas();
@@ -1608,10 +1609,371 @@ function emShowTab(tab){
 // ── PANEL RENDERERS ───────────────────────────────────
 // Renderiza todos los paneles solo si están vacíos (primera carga)
 
+// ── EM CONSTANTS — reutiliza EM_K, EM_EPS0, EM_MU0 ya declarados arriba ──
 
+function emFmt(v){
+  if(!isFinite(v)||isNaN(v)) return '—';
+  if(Math.abs(v)===0) return '0';
+  if(Math.abs(v)<0.001||Math.abs(v)>=1e6) return v.toExponential(4);
+  return parseFloat(v.toPrecision(6)).toString();
+}
+function emInp(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+function emRes(id,html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
 
+function emCard(id, icon, name, desc, fieldsHTML){
+  return `<div class="calc-card em-card" id="card-${id}">
+    <div class="calc-card-header" onclick="toggleCard('${id}')">
+      <div class="calc-card-icon em-card-icon">${icon}</div>
+      <div class="calc-card-info">
+        <div class="calc-card-name">${name}</div>
+        <div class="calc-card-desc">${desc}</div>
+      </div>
+      <div class="calc-card-arrow" id="arr-${id}">›</div>
+    </div>
+    <div class="calc-card-body" id="body-${id}">
+      <div class="calc-card-inner">${fieldsHTML}</div>
+    </div>
+  </div>`;
+}
 
+function emRenderPanels(){
+  // ── COULOMB ──
+  document.getElementById('em-pCoulomb').innerHTML =
+    emCard('em-coul','⚡','Fuerza de Coulomb','F = k·q₁·q₂ / r²',`
+      <div class="calc-field-row"><label>q₁ (C) =</label><input class="calc-inp" id="em-coul-q1" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>q₂ (C) =</label><input class="calc-inp" id="em-coul-q2" placeholder="-2e-6"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-coul-r" placeholder="0.1"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcCoulomb()">Calcular F</button>
+        <button class="calc-btn sec" onclick="clearCard('em-coul')">Limpiar</button>
+      </div>
+      <div id="res-em-coul" class="calc-res"></div>
+    `) +
+    emCard('em-efield','E','Campo Eléctrico','E = k·Q / r² — carga puntual',`
+      <div class="calc-field-row"><label>Q (C) =</label><input class="calc-inp" id="em-ef-q" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-ef-r" placeholder="0.05"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcEField()">Calcular E</button>
+        <button class="calc-btn sec" onclick="clearCard('em-efield')">Limpiar</button>
+      </div>
+      <div id="res-em-efield" class="calc-res"></div>
+    `);
 
+  // ── GAUSS ──
+  document.getElementById('em-pGauss').innerHTML =
+    emCard('em-gauss-flux','Φ','Flujo Eléctrico','Φ = Q_enc / ε₀',`
+      <div class="calc-field-row"><label>Q_enc (C) =</label><input class="calc-inp" id="em-gf-q" placeholder="1e-9"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcGaussFlux()">Calcular Φ</button>
+        <button class="calc-btn sec" onclick="clearCard('em-gauss-flux')">Limpiar</button>
+      </div>
+      <div id="res-em-gauss-flux" class="calc-res"></div>
+    `) +
+    emCard('em-gauss-sph','○','E Esférica','Superficie esférica — E = Q / (4πε₀r²)',`
+      <div class="calc-field-row"><label>Q (C) =</label><input class="calc-inp" id="em-gs-q" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-gs-r" placeholder="0.1"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcGaussSph()">Calcular E</button>
+        <button class="calc-btn sec" onclick="clearCard('em-gauss-sph')">Limpiar</button>
+      </div>
+      <div id="res-em-gauss-sph" class="calc-res"></div>
+    `) +
+    emCard('em-gauss-cyl','‖','E Cilíndrica','Línea infinita — E = λ / (2πε₀r)',`
+      <div class="calc-field-row"><label>λ (C/m) =</label><input class="calc-inp" id="em-gc-l" placeholder="1e-9"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-gc-r" placeholder="0.05"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcGaussCyl()">Calcular E</button>
+        <button class="calc-btn sec" onclick="clearCard('em-gauss-cyl')">Limpiar</button>
+      </div>
+      <div id="res-em-gauss-cyl" class="calc-res"></div>
+    `);
+
+  // ── POTENCIAL ──
+  document.getElementById('em-pPotential').innerHTML =
+    emCard('em-pot','V','Potencial Eléctrico','V = k·Q / r',`
+      <div class="calc-field-row"><label>Q (C) =</label><input class="calc-inp" id="em-pot-q" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-pot-r" placeholder="0.1"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcPotential()">Calcular V</button>
+        <button class="calc-btn sec" onclick="clearCard('em-pot')">Limpiar</button>
+      </div>
+      <div id="res-em-pot" class="calc-res"></div>
+    `) +
+    emCard('em-epot','U','Energía Potencial','U = k·q₁·q₂ / r',`
+      <div class="calc-field-row"><label>q₁ (C) =</label><input class="calc-inp" id="em-ep-q1" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>q₂ (C) =</label><input class="calc-inp" id="em-ep-q2" placeholder="-1e-6"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-ep-r" placeholder="0.05"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcEPot()">Calcular U</button>
+        <button class="calc-btn sec" onclick="clearCard('em-epot')">Limpiar</button>
+      </div>
+      <div id="res-em-epot" class="calc-res"></div>
+    `) +
+    emCard('em-cap','C','Capacitancia','C = Q/V — placas paralelas C = ε₀A/d',`
+      <div class="calc-field-row"><label>A (m²) =</label><input class="calc-inp" id="em-cap-a" placeholder="0.01"/></div>
+      <div class="calc-field-row"><label>d (m) =</label><input class="calc-inp" id="em-cap-d" placeholder="0.001"/></div>
+      <div class="calc-field-row"><label>εᵣ =</label><input class="calc-inp calc-inp-sm" id="em-cap-er" placeholder="1" value="1"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcCap()">Calcular C</button>
+        <button class="calc-btn sec" onclick="clearCard('em-cap')">Limpiar</button>
+      </div>
+      <div id="res-em-cap" class="calc-res"></div>
+    `);
+
+  // ── LORENTZ ──
+  document.getElementById('em-pLorentz').innerHTML =
+    emCard('em-lor','F','Fuerza de Lorentz','F = q(E + v × B)',`
+      <div class="calc-field-row"><label>q (C) =</label><input class="calc-inp" id="em-lor-q" placeholder="1.6e-19"/></div>
+      <div class="calc-field-row">
+        <label>E =</label>
+        <input class="calc-inp calc-inp-sm" id="em-lor-ex" placeholder="Ex"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-ey" placeholder="Ey"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-ez" placeholder="Ez"/>
+      </div>
+      <div class="calc-field-row">
+        <label>v =</label>
+        <input class="calc-inp calc-inp-sm" id="em-lor-vx" placeholder="vx"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-vy" placeholder="vy"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-vz" placeholder="vz"/>
+      </div>
+      <div class="calc-field-row">
+        <label>B =</label>
+        <input class="calc-inp calc-inp-sm" id="em-lor-bx" placeholder="Bx"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-by" placeholder="By"/>
+        <input class="calc-inp calc-inp-sm" id="em-lor-bz" placeholder="Bz"/>
+      </div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcLorentz()">Calcular F</button>
+        <button class="calc-btn sec" onclick="clearCard('em-lor')">Limpiar</button>
+      </div>
+      <div id="res-em-lor" class="calc-res"></div>
+    `) +
+    emCard('em-bfield','B','Campo Magnético','B = μ₀I / (2πr) — hilo infinito',`
+      <div class="calc-field-row"><label>I (A) =</label><input class="calc-inp" id="em-bf-i" placeholder="10"/></div>
+      <div class="calc-field-row"><label>r (m) =</label><input class="calc-inp" id="em-bf-r" placeholder="0.05"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcBField()">Calcular B</button>
+        <button class="calc-btn sec" onclick="clearCard('em-bfield')">Limpiar</button>
+      </div>
+      <div id="res-em-bfield" class="calc-res"></div>
+    `);
+
+  // ── FARADAY ──
+  document.getElementById('em-pFaraday').innerHTML =
+    emCard('em-far','ε','FEM Inducida','ε = −N · ΔΦ/Δt',`
+      <div class="calc-field-row"><label>N (espiras) =</label><input class="calc-inp calc-inp-sm" id="em-far-n" placeholder="1" value="1"/></div>
+      <div class="calc-field-row"><label>Φ₁ (Wb) =</label><input class="calc-inp" id="em-far-p1" placeholder="0.01"/></div>
+      <div class="calc-field-row"><label>Φ₂ (Wb) =</label><input class="calc-inp" id="em-far-p2" placeholder="0.005"/></div>
+      <div class="calc-field-row"><label>Δt (s) =</label><input class="calc-inp" id="em-far-dt" placeholder="0.1"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcFaraday()">Calcular ε</button>
+        <button class="calc-btn sec" onclick="clearCard('em-far')">Limpiar</button>
+      </div>
+      <div id="res-em-far" class="calc-res"></div>
+    `) +
+    emCard('em-ind','L','Inductancia','L = NΦ / I — y energía U = ½LI²',`
+      <div class="calc-field-row"><label>N =</label><input class="calc-inp calc-inp-sm" id="em-ind-n" placeholder="100"/></div>
+      <div class="calc-field-row"><label>Φ (Wb) =</label><input class="calc-inp" id="em-ind-p" placeholder="0.001"/></div>
+      <div class="calc-field-row"><label>I (A) =</label><input class="calc-inp" id="em-ind-i" placeholder="2"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcInductance()">Calcular L</button>
+        <button class="calc-btn sec" onclick="clearCard('em-ind')">Limpiar</button>
+      </div>
+      <div id="res-em-ind" class="calc-res"></div>
+    `);
+
+  // ── MAXWELL ──
+  document.getElementById('em-pMaxwell').innerHTML =
+    emCard('em-mxw-ohm','Ω','Ley de Ohm & Potencia','V = IR, P = IV, P = I²R',`
+      <div class="calc-field-row"><label>V (V) =</label><input class="calc-inp" id="em-ohm-v" placeholder=""/></div>
+      <div class="calc-field-row"><label>I (A) =</label><input class="calc-inp" id="em-ohm-i" placeholder=""/></div>
+      <div class="calc-field-row"><label>R (Ω) =</label><input class="calc-inp" id="em-ohm-r" placeholder=""/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcOhm()">Resolver</button>
+        <button class="calc-btn sec" onclick="clearCard('em-mxw-ohm')">Limpiar</button>
+      </div>
+      <div id="res-em-mxw-ohm" class="calc-res"></div>
+    `) +
+    emCard('em-mxw-rc','τ','Circuito RC','τ = RC — carga/descarga',`
+      <div class="calc-field-row"><label>R (Ω) =</label><input class="calc-inp" id="em-rc-r" placeholder="1000"/></div>
+      <div class="calc-field-row"><label>C (F) =</label><input class="calc-inp" id="em-rc-c" placeholder="1e-6"/></div>
+      <div class="calc-field-row"><label>V₀ (V) =</label><input class="calc-inp" id="em-rc-v0" placeholder="12"/></div>
+      <div class="calc-field-row"><label>t (s) =</label><input class="calc-inp" id="em-rc-t" placeholder="0.001"/></div>
+      <div class="calc-btn-row">
+        <button class="calc-btn em-btn" onclick="emCalcRC()">Calcular</button>
+        <button class="calc-btn sec" onclick="clearCard('em-mxw-rc')">Limpiar</button>
+      </div>
+      <div id="res-em-mxw-rc" class="calc-res"></div>
+    `) +
+    `<div class="calc-card em-card" style="padding:14px;opacity:.7">
+      <div style="font-size:11px;font-family:'Space Mono',monospace;color:var(--text2);line-height:1.8">
+        <div style="font-weight:700;color:var(--fi);margin-bottom:6px">Ecuaciones de Maxwell</div>
+        <div>∇·E = ρ/ε₀ <span style="color:var(--text3);margin-left:8px">— Ley de Gauss</span></div>
+        <div>∇·B = 0 <span style="color:var(--text3);margin-left:8px">— No monopolos</span></div>
+        <div>∇×E = −∂B/∂t <span style="color:var(--text3);margin-left:8px">— Faraday</span></div>
+        <div>∇×B = μ₀J + μ₀ε₀∂E/∂t <span style="color:var(--text3);margin-left:8px">— Ampère-Maxwell</span></div>
+      </div>
+    </div>`;
+}
+
+// ── EM CALCULATION FUNCTIONS ─────────────────────────
+function emCalcCoulomb(){
+  const q1=emInp('em-coul-q1'), q2=emInp('em-coul-q2'), r=emInp('em-coul-r');
+  if(r===0) return emRes('res-em-coul','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const F=EM_K*q1*q2/(r*r);
+  const tipo=F>0?'repulsiva':'atractiva';
+  emRes('res-em-coul',`
+    <div class="calc-res-lbl">Fuerza</div>
+    <div class="calc-res-val">F = ${emFmt(F)} N</div>
+    <div class="calc-res-lbl" style="margin-top:4px">|F| = ${emFmt(Math.abs(F))} N — ${tipo}</div>
+  `);
+}
+function emCalcEField(){
+  const Q=emInp('em-ef-q'), r=emInp('em-ef-r');
+  if(r===0) return emRes('res-em-efield','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const E=EM_K*Q/(r*r);
+  emRes('res-em-efield',`
+    <div class="calc-res-lbl">Campo eléctrico</div>
+    <div class="calc-res-val">E = ${emFmt(E)} N/C</div>
+    <div class="calc-res-lbl" style="margin-top:4px">Dirección: ${E>0?'radial hacia afuera ↗':'radial hacia adentro ↙'}</div>
+  `);
+}
+function emCalcGaussFlux(){
+  const Q=emInp('em-gf-q');
+  const phi=Q/EM_EPS0;
+  emRes('res-em-gauss-flux',`
+    <div class="calc-res-lbl">Flujo eléctrico</div>
+    <div class="calc-res-val">Φ = ${emFmt(phi)} N·m²/C</div>
+    <div class="calc-res-lbl" style="margin-top:4px">ε₀ = ${EM_EPS0.toExponential(4)} F/m</div>
+  `);
+}
+function emCalcGaussSph(){
+  const Q=emInp('em-gs-q'), r=emInp('em-gs-r');
+  if(r===0) return emRes('res-em-gauss-sph','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const E=Q/(4*Math.PI*EM_EPS0*r*r);
+  emRes('res-em-gauss-sph',`
+    <div class="calc-res-lbl">Campo (simetría esférica)</div>
+    <div class="calc-res-val">E = ${emFmt(E)} N/C</div>
+  `);
+}
+function emCalcGaussCyl(){
+  const lambda=emInp('em-gc-l'), r=emInp('em-gc-r');
+  if(r===0) return emRes('res-em-gauss-cyl','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const E=lambda/(2*Math.PI*EM_EPS0*r);
+  emRes('res-em-gauss-cyl',`
+    <div class="calc-res-lbl">Campo (línea infinita)</div>
+    <div class="calc-res-val">E = ${emFmt(E)} N/C</div>
+  `);
+}
+function emCalcPotential(){
+  const Q=emInp('em-pot-q'), r=emInp('em-pot-r');
+  if(r===0) return emRes('res-em-pot','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const V=EM_K*Q/r;
+  emRes('res-em-pot',`
+    <div class="calc-res-lbl">Potencial eléctrico</div>
+    <div class="calc-res-val">V = ${emFmt(V)} V</div>
+  `);
+}
+function emCalcEPot(){
+  const q1=emInp('em-ep-q1'), q2=emInp('em-ep-q2'), r=emInp('em-ep-r');
+  if(r===0) return emRes('res-em-epot','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const U=EM_K*q1*q2/r;
+  emRes('res-em-epot',`
+    <div class="calc-res-lbl">Energía potencial</div>
+    <div class="calc-res-val">U = ${emFmt(U)} J</div>
+    <div class="calc-res-lbl" style="margin-top:4px">${U<0?'Sistema ligado (atractivo)':'Sistema repulsivo'}</div>
+  `);
+}
+function emCalcCap(){
+  const A=emInp('em-cap-a'), d=emInp('em-cap-d'), er=emInp('em-cap-er')||1;
+  if(d===0) return emRes('res-em-cap','<div class="calc-res-val" style="color:var(--red)">d no puede ser 0</div>');
+  const C=er*EM_EPS0*A/d;
+  const Uf=0; // no voltage given
+  emRes('res-em-cap',`
+    <div class="calc-res-lbl">Capacitancia</div>
+    <div class="calc-res-val">C = ${emFmt(C)} F</div>
+    <div class="calc-res-lbl" style="margin-top:4px">${C>1e-6?emFmt(C*1e6)+' μF':C>1e-9?emFmt(C*1e9)+' nF':emFmt(C*1e12)+' pF'}</div>
+  `);
+}
+function emCalcLorentz(){
+  const q=emInp('em-lor-q');
+  const ex=emInp('em-lor-ex'),ey=emInp('em-lor-ey'),ez=emInp('em-lor-ez');
+  const vx=emInp('em-lor-vx'),vy=emInp('em-lor-vy'),vz=emInp('em-lor-vz');
+  const bx=emInp('em-lor-bx'),by=emInp('em-lor-by'),bz=emInp('em-lor-bz');
+  // v × B
+  const cx=vy*bz-vz*by, cy=vz*bx-vx*bz, cz=vx*by-vy*bx;
+  const fx=q*(ex+cx), fy=q*(ey+cy), fz=q*(ez+cz);
+  const mag=Math.sqrt(fx*fx+fy*fy+fz*fz);
+  emRes('res-em-lor',`
+    <div class="calc-res-lbl">Fuerza de Lorentz</div>
+    <div class="calc-res-val">F = (${emFmt(fx)}, ${emFmt(fy)}, ${emFmt(fz)}) N</div>
+    <div class="calc-res-lbl" style="margin-top:4px">|F| = ${emFmt(mag)} N</div>
+    <div class="calc-res-lbl">v × B = (${emFmt(cx)}, ${emFmt(cy)}, ${emFmt(cz)})</div>
+  `);
+}
+function emCalcBField(){
+  const I=emInp('em-bf-i'), r=emInp('em-bf-r');
+  if(r===0) return emRes('res-em-bfield','<div class="calc-res-val" style="color:var(--red)">r no puede ser 0</div>');
+  const B=EM_MU0*I/(2*Math.PI*r);
+  emRes('res-em-bfield',`
+    <div class="calc-res-lbl">Campo magnético</div>
+    <div class="calc-res-val">B = ${emFmt(B)} T</div>
+    <div class="calc-res-lbl" style="margin-top:4px">${B>1e-3?emFmt(B*1e3)+' mT':emFmt(B*1e6)+' μT'}</div>
+  `);
+}
+function emCalcFaraday(){
+  const N=emInp('em-far-n')||1, p1=emInp('em-far-p1'), p2=emInp('em-far-p2'), dt=emInp('em-far-dt');
+  if(dt===0) return emRes('res-em-far','<div class="calc-res-val" style="color:var(--red)">Δt no puede ser 0</div>');
+  const emf=-N*(p2-p1)/dt;
+  emRes('res-em-far',`
+    <div class="calc-res-lbl">FEM inducida</div>
+    <div class="calc-res-val">ε = ${emFmt(emf)} V</div>
+    <div class="calc-res-lbl" style="margin-top:4px">ΔΦ = ${emFmt(p2-p1)} Wb · N = ${N}</div>
+  `);
+}
+function emCalcInductance(){
+  const N=emInp('em-ind-n'), phi=emInp('em-ind-p'), I=emInp('em-ind-i');
+  if(I===0) return emRes('res-em-ind','<div class="calc-res-val" style="color:var(--red)">I no puede ser 0</div>');
+  const L=N*phi/I;
+  const U=0.5*L*I*I;
+  emRes('res-em-ind',`
+    <div class="calc-res-lbl">Inductancia</div>
+    <div class="calc-res-val">L = ${emFmt(L)} H</div>
+    <div class="calc-res-lbl" style="margin-top:4px">${L>1e-3?emFmt(L*1e3)+' mH':emFmt(L*1e6)+' μH'}</div>
+    <div class="calc-res-lbl" style="margin-top:4px">Energía: U = ½LI² = ${emFmt(U)} J</div>
+  `);
+}
+function emCalcOhm(){
+  let V=parseFloat(document.getElementById('em-ohm-v')?.value);
+  let I=parseFloat(document.getElementById('em-ohm-i')?.value);
+  let R=parseFloat(document.getElementById('em-ohm-r')?.value);
+  const hv=isFinite(V), hi=isFinite(I), hr=isFinite(R);
+  if(hv&&hi&&!hr) R=V/I;
+  else if(hv&&!hi&&hr) I=V/R;
+  else if(!hv&&hi&&hr) V=I*R;
+  else if(hv&&hi&&hr){/* all given, just compute */}
+  else return emRes('res-em-mxw-ohm','<div class="calc-res-val" style="color:var(--text3)">Ingresa al menos 2 de los 3 valores</div>');
+  const P=V*I;
+  emRes('res-em-mxw-ohm',`
+    <div class="calc-res-lbl">Resultados</div>
+    <div class="calc-res-val">V = ${emFmt(V)} V · I = ${emFmt(I)} A · R = ${emFmt(R)} Ω</div>
+    <div class="calc-res-lbl" style="margin-top:4px">Potencia: P = ${emFmt(P)} W</div>
+  `);
+}
+function emCalcRC(){
+  const R=emInp('em-rc-r'), C=emInp('em-rc-c'), V0=emInp('em-rc-v0'), t=emInp('em-rc-t');
+  const tau=R*C;
+  if(tau===0) return emRes('res-em-mxw-rc','<div class="calc-res-val" style="color:var(--red)">τ = 0 — verifica R y C</div>');
+  const vCharge=V0*(1-Math.exp(-t/tau));
+  const vDischarge=V0*Math.exp(-t/tau);
+  emRes('res-em-mxw-rc',`
+    <div class="calc-res-lbl">Constante de tiempo</div>
+    <div class="calc-res-val">τ = RC = ${emFmt(tau)} s</div>
+    <div class="calc-res-lbl" style="margin-top:6px">En t = ${emFmt(t)} s:</div>
+    <div class="calc-res-val">Carga: V(t) = ${emFmt(vCharge)} V</div>
+    <div class="calc-res-val">Descarga: V(t) = ${emFmt(vDischarge)} V</div>
+  `);
+}
 // ═══════════════════════════════════════════════════════
 // SUPER CALC v3.0.0 — NAVIGATION
 // ═══════════════════════════════════════════════════════

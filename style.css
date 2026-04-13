@@ -4,7 +4,7 @@
 
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);
   font-family:'Space Grotesk',sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
-#app{display:flex;flex-direction:column;width:100vw;height:100dvh;overflow:hidden;background:var(--bg)}
+#app{position:fixed;inset:0;z-index:998;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 
 /* ── HEADER ── */
 header{
@@ -385,9 +385,15 @@ canvas:active{cursor:grabbing}
   color:var(--text3);background:none;border:none;font-family:'Space Mono',monospace;
   cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;white-space:nowrap;
 }
-.em-tab.on{color:var(--blue);border-bottom-color:var(--blue);background:var(--surface)}
+.em-tab.on{color:var(--fi);border-bottom-color:var(--fi);background:var(--surface)}
 .em-panel{display:none;padding:12px 14px 16px;overflow-y:auto;max-height:240px}
 .em-panel.on{display:block}
+/* EM cards — accent overrides usando --fi (física) */
+.em-card.active{border-color:var(--fi2);}
+.em-card .calc-card-header:hover{background:rgba(var(--fi-rgb),.04);}
+.em-card-icon{background:var(--fi)!important;color:#fff!important;}
+.em-btn{border-color:var(--fi)!important;color:var(--fi)!important;}
+.em-btn:hover{background:rgba(var(--fi-rgb),.2)!important;}
 
 /* EM Cards & UI */
 .em-section-title{
