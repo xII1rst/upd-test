@@ -12,22 +12,46 @@
   const ctx = cv.getContext('2d');
 
   const FORMULAS = [
+    // ── Mecánica clásica ──
     'E = mc²','F = ma','PV = nRT','a² + b² = c²',
-    '∇·E = ρ/ε₀','∇×B = μ₀J','λ = h/p','∂f/∂x',
-    '∮E·dA = Q/ε₀','eⁱᵖ + 1 = 0','F = kq₁q₂/r²',
-    'sin²θ + cos²θ = 1','v = λf','p = mv',
-    '∫₀^∞ e⁻ˣ dx','lim(x→0)','dy/dx','∇²φ = 0',
-    'τ = r × F','W = ΔKE','n! = n(n-1)!','i² = -1',
-    '|v| = √(x²+y²)','T = 2π√(L/g)','β = v/c',
-    'Ψ(x,t)','ΔxΔp ≥ ħ/2','∂²u/∂t²',
-    'f(x) = Σ aₙxⁿ','ω = 2πf','Z = R + jX',
-    'A·B = |A||B|cosθ','A×B = |A||B|sinθ',
+    'p = mv','τ = r × F','W = ΔKE','v = λf',
+    'v² = u² + 2as','s = ut + ½at²','T = 2π√(L/g)',
+    'F = −kx','L = Iω','K = ½mv²','P = Fv',
+    'J = FΔt','ω = dθ/dt','ac = v²/r',
+    // ── Electromagnetismo ──
+    '∇·E = ρ/ε₀','∇×B = μ₀J','F = kq₁q₂/r²',
+    '∮E·dA = Q/ε₀','V = IR','P = IV',
+    'Z = R + jX','ε = −dΦ/dt','B = μ₀I/2πr',
+    'C = Q/V','U = ½CV²','τ = RC',
+    // ── Cuántica & ondas ──
+    'λ = h/p','Ψ(x,t)','ΔxΔp ≥ ħ/2','β = v/c',
+    'E = hf','ψ = Ae^(ikx)','⟨x⟩ = ∫ψ*xψ dx',
+    'Ĥψ = Eψ','S = ħ/2','n² = n(n+1)',
+    // ── Cálculo ──
+    '∂f/∂x','dy/dx','∇²φ = 0','∂²u/∂t²',
+    '∫₀^∞ e⁻ˣ dx','lim(x→0)','f(x) = Σ aₙxⁿ',
+    'd/dx[eˣ] = eˣ','∫sin(x)dx = −cos(x)',
+    '∂z/∂x','∬f dA','∇f = ⟨fₓ,fᵧ⟩',
+    'L{f} = ∫e⁻ˢᵗf dt','Γ(n) = (n−1)!',
+    // ── Álgebra lineal ──
+    'det(A)','A·B = |A||B|cosθ','A×B = |A||B|sinθ',
+    'Ax = λx','tr(A)','A⁻¹A = I',
+    'rank(A)','‖v‖ = √(Σvᵢ²)','proj_u v',
+    // ── Termodinámica ──
     'q = mcΔT','S = k·ln W','η = W/Q_H',
-    'v² = u² + 2as','s = ut + ½at²',
-    'det(A)','Σᵢ xᵢ/n','P(A|B)','E[X]',
-    'cosh²x − sinh²x = 1','log_b(xy)',
+    'ΔG = ΔH − TΔS','dU = δQ − δW','PV^γ = C',
+    // ── Probabilidad & estadística ──
+    'Σᵢ xᵢ/n','P(A|B)','E[X]','σ² = E[(X−μ)²]',
+    'P(A∪B)','Cov(X,Y)','ρ = σ_xy/σ_xσ_y',
+    'n! = n(n-1)!','C(n,k) = n!/k!(n-k)!',
+    // ── Identidades & constantes ──
+    'eⁱᵖ + 1 = 0','sin²θ + cos²θ = 1','i² = -1',
+    'cosh²x − sinh²x = 1','log_b(xy)','ω = 2πf',
+    '|v| = √(x²+y²)','e = lim(1+1/n)ⁿ',
+    'sin(2θ) = 2sinθcosθ','ln(ab) = ln a + ln b',
+    // ── Símbolos sueltos ──
     'α','β','γ','δ','ε','θ','λ','μ','ν','ρ','σ','τ','φ','ψ','ω','ξ',
-    '∞','∫','∂','∇','∑','Π','√','±','≈','≠','∈','∅','ħ','Δ','∮',
+    '∞','∫','∂','∇','∑','Π','√','±','≈','≠','∈','∅','ħ','Δ','∮','ℝ','ℂ','ℕ',
   ];
 
   const COLORS = [
@@ -63,7 +87,7 @@
     items = [];
 
     const measure = document.createElement('canvas').getContext('2d');
-    const totalCount = Math.floor((W * H) / 9000);
+    const totalCount = Math.floor((W * H) / 6900); // ~30% más densidad que /9000
 
     LAYERS.forEach((layer, li) => {
       const n = Math.round(totalCount * layer.count);

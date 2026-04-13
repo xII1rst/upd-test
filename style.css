@@ -1425,6 +1425,33 @@ body::after {
 /* ── Cards launcher en light — fondo blanco puro ── */
 [data-theme="light"] .lmod-card { background: #ffffff; }
 
+/* ── Logo SVG — NEGATIVO light theme ────────────────── */
+/* Grid cartesiano → rosa */
+[data-theme="light"] #sc-omega-logo > g:first-of-type { stroke: #d83870; }
+
+/* Órbitas → paleta cálida rosa */
+[data-theme="light"] #sc-omega-logo > ellipse:nth-of-type(1) { stroke: #d83870; }
+[data-theme="light"] #sc-omega-logo > ellipse:nth-of-type(2) { stroke: #e87898; }
+[data-theme="light"] #sc-omega-logo > ellipse:nth-of-type(3) { stroke: #c89040; }
+
+/* Electrón 1 (∑) — rosa principal */
+[data-theme="light"] #sc-e1 > circle { stroke: #d83870; fill: #fff5f8; }
+[data-theme="light"] #sc-e1 > text   { fill: #d83870; }
+
+/* Electrón 2 (π) — rosa coral */
+[data-theme="light"] #sc-e2 > circle { stroke: #e87898; fill: #fff5f8; }
+[data-theme="light"] #sc-e2 > text   { fill: #e87898; }
+
+/* Electrón 3 (∂) — dorado cálido */
+[data-theme="light"] #sc-e3 > circle { stroke: #c89040; fill: #fff5f8; }
+[data-theme="light"] #sc-e3 > text   { fill: #c89040; }
+
+/* Halo central → rosa */
+[data-theme="light"] #sc-omega-logo > circle[r="40"] { fill: rgba(216,56,112,.07); }
+
+/* Ω texto → rosa sólido (overrides el gradient del dark) */
+[data-theme="light"] #sc-omega-logo > text:last-of-type { fill: #d83870; }
+
 /* ══════════════════════════════════════════════════════
    SWITCH DE TEMA — base CSS (dark + light)
    ══════════════════════════════════════════════════════ */
