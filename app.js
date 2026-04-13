@@ -425,6 +425,48 @@ function toggleFigure(){
 
 // ── MATH HELPERS ──────────────────────────────────────
 
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────
+// Persiste en localStorage. Aplica data-theme="light"|"dark" al <html>.
+// El CSS hace el resto vía [data-theme="light"] selectors.
+(function initTheme(){
+  const saved = localStorage.getItem('sc-theme') || 'dark';
+  applyTheme(saved, false);
+})();
+
+function applyTheme(theme, animate = true){
+  const root   = document.documentElement;
+  const sw     = document.getElementById('theme-switch');
+  const knob   = document.getElementById('theme-knob');
+
+  if(animate){
+    // Micro-transición del knob ya está en CSS (cubic-bezier)
+    // Flash de opacidad en el body para suavizar el cambio de paleta
+    document.body.style.transition = 'background .3s, color .3s';
+  }
+
+  if(theme === 'light'){
+    root.setAttribute('data-theme', 'light');
+    if(sw) sw.setAttribute('aria-checked', 'true');
+  } else {
+    root.removeAttribute('data-theme');
+    if(sw) sw.setAttribute('aria-checked', 'false');
+  }
+
+  localStorage.setItem('sc-theme', theme);
+
+  // Actualizar el meta theme-color del navegador
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if(metaTheme){
+    metaTheme.content = theme === 'light' ? '#fffdf7' : '#0a0f1a';
+  }
+}
+
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'light' ? 'dark' : 'light', true);
+}
+// ── END THEME SYSTEM ──────────────────────────────────────────────────────
+
 // ── SISTEMA DE NOTIFICACIONES (reemplaza alert()) ────────────────────────
 function scToast(msg, type='info', duration=3200){
   const el = document.createElement('div');

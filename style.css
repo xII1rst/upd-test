@@ -1383,3 +1383,266 @@ body::after {
   background-repeat:repeat;
   background-size:300px 300px;
 }
+
+/* ══════════════════════════════════════════════════════
+   TEMA LIGHT — tokens de color
+   Activado con: <html data-theme="light">
+
+   AL  → amarillo ocre cálido  (#b8880a / #d4a810)
+   FÍS → rosa claro            (#c84870 / #e8709a)
+   CAL → café caramel          (#8a6030 / #a87848)
+   ══════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* ── Base ── */
+  --bg:       #fffdf7;
+  --surface:  #f7f2e8;
+  --surface2: #ede6d8;
+  --surface3: #e3d8c4;
+  --border:   #d8ceba;
+  --border2:  #c4b49a;
+
+  /* ── Texto ── */
+  --text:     #1a1208;
+  --text1:    #1a1208;
+  --text2:    #5c4a2a;
+  --text3:    #9c8060;
+
+  /* ── Acento global ── */
+  --accent:   #c8900a;
+  --accent2:  #a87008;
+  --gold:     #c8900a;
+
+  /* ── Semánticos ── */
+  --red:      #c0300a;
+  --green:    #276b45;
+  --blue:     #1a509a;
+  --purple:   #6030a8;
+  --teal:     #1a7070;
+  --orange:   #c05818;
+  --pink:     #c03060;
+
+  /* ── Módulo AL — amarillo ocre (que se note que es amarillo) ── */
+  --al:       #b8880a;
+  --al2:      #d4a810;
+
+  /* ── Módulo FÍS — rosa claro ── */
+  --fi:       #c84870;
+  --fi2:      #e8709a;
+
+  /* ── Módulo CAL — café caramel ── */
+  --ca:       #8a6030;
+  --ca2:      #a87848;
+  --ca3:      #c49060;
+
+  /* ── Overrides de módulos ── */
+  --mat-accent:  #b8880a;
+  --ineq-accent: #c03060;
+}
+
+/* ── body en light ── */
+[data-theme="light"] body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── Canvas de fórmulas: blend para que no tape el fondo blanco ── */
+[data-theme="light"] #sc-bg-canvas {
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+/* ── Grain noise: más sutil en light ── */
+[data-theme="light"] body::after { opacity: .018; }
+
+/* ── Logo text en light ── */
+[data-theme="light"] .sc-logo-name { color: #1a1208; }
+[data-theme="light"] .sc-logo-name .hi { color: var(--al); }
+[data-theme="light"] .sc-logo-sub { color: var(--text3); }
+[data-theme="light"] .sc-logo-ver { color: var(--text3); }
+
+/* ── Glow del Ω menos intenso en light ── */
+[data-theme="light"] #sc-omega-logo {
+  filter: drop-shadow(0 0 18px rgba(184,136,10,.35));
+}
+[data-theme="light"] .sc-logo::before {
+  background: radial-gradient(circle, rgba(184,136,10,.14) 0%, transparent 70%);
+}
+
+/* ── Cards del launcher en light ── */
+[data-theme="light"] .lmod-card {
+  background: #ffffff;
+  border-color: #d8ceba;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+[data-theme="light"] .lmod-name { color: #1a1208; }
+
+/* Hover por módulo en light */
+[data-theme="light"] .lmod-card.al:hover {
+  border-color: rgba(184,136,10,.6);
+  box-shadow: 0 10px 40px rgba(184,136,10,.18), 0 0 0 1px rgba(184,136,10,.12) inset;
+}
+[data-theme="light"] .lmod-card.fi:hover {
+  border-color: rgba(200,72,112,.6);
+  box-shadow: 0 10px 40px rgba(200,72,112,.18), 0 0 0 1px rgba(200,72,112,.12) inset;
+}
+[data-theme="light"] .lmod-card.ca:hover {
+  border-color: rgba(138,96,48,.6);
+  box-shadow: 0 10px 40px rgba(138,96,48,.18), 0 0 0 1px rgba(138,96,48,.12) inset;
+}
+
+/* Badges en light */
+[data-theme="light"] .lmod-badge.al {
+  background: rgba(184,136,10,.12); color: #8a6008;
+  border-color: rgba(184,136,10,.3);
+}
+[data-theme="light"] .lmod-badge.fi {
+  background: rgba(200,72,112,.1); color: #b03060;
+  border-color: rgba(200,72,112,.25);
+}
+[data-theme="light"] .lmod-badge.ca {
+  background: rgba(138,96,48,.1); color: #7a5028;
+  border-color: rgba(138,96,48,.25);
+}
+
+/* ── Header de módulos en light ── */
+[data-theme="light"] header {
+  background: #f7f2e8;
+  border-bottom-color: var(--border);
+}
+[data-theme="light"] .mod-back {
+  background: rgba(0,0,0,.04);
+  border-color: var(--border);
+  color: var(--text2);
+}
+
+/* ── Canvas de vectores en light ── */
+[data-theme="light"] #cw { background: #f0ebe0; }
+
+/* ── Panel lateral en light ── */
+[data-theme="light"] #bottom {
+  background: #f7f2e8;
+  border-color: var(--border);
+}
+[data-theme="light"] .tabs { background: #ede6d8; }
+[data-theme="light"] .tab { color: var(--text3); }
+[data-theme="light"] .tab.on { color: var(--al); border-bottom-color: var(--al); }
+[data-theme="light"] .vec-card { background: #f0ebe0; border-color: var(--border); }
+[data-theme="light"] .inp-group input {
+  background: #ffffff;
+  border-color: var(--border);
+  color: var(--text);
+}
+[data-theme="light"] .inp-group input:focus {
+  border-color: var(--al);
+  background: rgba(184,136,10,.04);
+  box-shadow: 0 0 0 2px rgba(184,136,10,.12);
+}
+
+/* ── Inputs y botones globales en light ── */
+[data-theme="light"] .action-btn {
+  background: rgba(184,136,10,.1);
+  border-color: rgba(184,136,10,.3);
+  color: var(--al);
+}
+[data-theme="light"] .add-vec-btn {
+  border-color: var(--border2);
+  color: var(--text3);
+}
+[data-theme="light"] .add-vec-btn:hover {
+  border-color: var(--al);
+  color: var(--al2);
+}
+
+/* ── Submodule screen en light ── */
+[data-theme="light"] #submod-screen { background: #fffdf7; }
+[data-theme="light"] .submod-back {
+  background: rgba(0,0,0,.04);
+  border-color: var(--border);
+  color: var(--text2);
+}
+[data-theme="light"] .submod-card {
+  background: #ffffff;
+  border-color: var(--border);
+}
+[data-theme="light"] .submod-name { color: var(--text); }
+[data-theme="light"] .submod-desc { color: var(--text3); }
+
+/* ── Author footer en light ── */
+[data-theme="light"] #sc-author-footer { color: var(--text3); }
+
+/* ══════════════════════════════════════════════════════
+   THEME SWITCH — toggle dark/light
+   ══════════════════════════════════════════════════════ */
+.theme-switch-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  animation: sub-fade .6s ease .8s both;
+}
+
+.theme-switch-lbl {
+  font-size: 14px;
+  line-height: 1;
+  transition: opacity .25s, transform .25s;
+  user-select: none;
+}
+
+/* Track — el fondo del switch */
+.theme-switch-track {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(124,106,247,.35);
+  background: rgba(124,106,247,.15);
+  cursor: pointer;
+  transition: background .3s, border-color .3s;
+  outline: none;
+  padding: 0;
+  /* fallback sin apariencia nativa */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Track en light */
+[data-theme="light"] .theme-switch-track {
+  background: rgba(184,136,10,.18);
+  border-color: rgba(184,136,10,.4);
+}
+[data-theme="light"] .theme-switch-track:hover {
+  background: rgba(184,136,10,.28);
+}
+
+.theme-switch-track:hover {
+  background: rgba(124,106,247,.25);
+  border-color: rgba(124,106,247,.55);
+}
+
+/* Knob — la pastilla que se desliza */
+.theme-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #a594ff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.35);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), background .25s;
+  pointer-events: none;
+  display: block;
+}
+
+/* Knob en light — desplazado a la derecha */
+[data-theme="light"] .theme-switch-knob {
+  transform: translateX(24px);
+  background: #d4a810;
+  box-shadow: 0 1px 6px rgba(0,0,0,.2);
+}
+
+/* Emojis: oscurecer el ☀️ en dark y 🌙 en light */
+#theme-lbl-dark  { opacity: 1; }
+#theme-lbl-light { opacity: .35; }
+[data-theme="light"] #theme-lbl-dark  { opacity: .35; }
+[data-theme="light"] #theme-lbl-light { opacity: 1; }
