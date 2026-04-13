@@ -170,6 +170,7 @@
 })();
 
 
+// ── PWA: Service Worker + Install Prompt ─────────────
 let deferredPrompt=null;
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js', {scope: './'}).then(reg => {
@@ -182,7 +183,6 @@ if('serviceWorker' in navigator){
   }).catch(() => {});
 }
 
-
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); deferredPrompt=e; showInstallBanner();
 });
@@ -194,6 +194,14 @@ function showInstallBanner(){
   b.id='install-banner';
   b.classList.add('install-banner-ui');
   b.innerHTML='<div class="install-banner-text">📲 Añadir <span>SuperCalc</span> a inicio</div><div class="install-banner-actions"><button class="install-banner-btn-primary" onclick="installApp()">Instalar</button><button class="install-banner-btn-secondary" onclick="dismissInstall()">Ahora no</button></div>';
+  document.body.appendChild(b);
+}
+function showUpdateBanner(){
+  if(document.getElementById('update-banner'))return;
+  const b=document.createElement('div');
+  b.id='update-banner';
+  b.classList.add('install-banner-ui');
+  b.innerHTML='<div class="install-banner-text">🔄 Nueva versión de <span>SuperCalc</span></div><div class="install-banner-actions"><button class="install-banner-btn-primary" onclick="location.reload()">Actualizar</button><button class="install-banner-btn-secondary" onclick="this.closest(\'.install-banner-ui\').remove()">Luego</button></div>';
   document.body.appendChild(b);
 }
 function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{
@@ -4900,6 +4908,7 @@ function grafClear() {
   document.getElementById('graf-table').innerHTML='';
   grafInitFields();
 }
+
 
 function grafGridStep(range, targetDivs) {
   const raw = range/targetDivs;
