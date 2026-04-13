@@ -302,35 +302,42 @@
     </div>
   </div>
 
-  <div id="em-cw">
-    <canvas id="em-canvas"></canvas>
-    <div id="em-legend-canvas"></div>
-    <button id="btn-em-reset" onclick="emResetView()" style="position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:11px;font-family:Space Mono,monospace;padding:6px 12px;cursor:pointer;letter-spacing:.04em;transition:all .2s">↺ Reset</button>
-  </div>
+  <div class="em-body-wrap">
 
-  <div class="em-panel-tog-wrap">
-    <div id="em-panel-tog-btn" class="on" onclick="emTogglePanel()">
-      <span class="tog-lbl">Panel</span>
-      <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+    <div class="em-canvas-area">
+      <div id="em-cw">
+        <canvas id="em-canvas"></canvas>
+        <div id="em-legend-canvas"></div>
+        <button id="btn-em-reset" onclick="emResetView()">↺ Reset</button>
+      </div>
     </div>
-  </div>
 
-  <div id="em-bottom">
-    <div class="em-tabs">
-      <button class="em-tab on"  onclick="emShowTab('coulomb')">Coulomb</button>
-      <button class="em-tab"     onclick="emShowTab('gauss')">Gauss</button>
-      <button class="em-tab"     onclick="emShowTab('potential')">Potencial</button>
-      <button class="em-tab"     onclick="emShowTab('lorentz')">Lorentz</button>
-      <button class="em-tab"     onclick="emShowTab('faraday')">Faraday</button>
-      <button class="em-tab"     onclick="emShowTab('maxwell')">Maxwell</button>
+    <div class="em-panel-area">
+      <div class="em-panel-tog-wrap">
+        <div id="em-panel-tog-btn" class="on" onclick="emTogglePanel()">
+          <span class="tog-lbl">Panel</span>
+          <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
+        </div>
+      </div>
+      <div id="em-bottom">
+        <div class="em-tabs">
+          <button class="em-tab on"  onclick="emShowTab('coulomb')">Coulomb</button>
+          <button class="em-tab"     onclick="emShowTab('gauss')">Gauss</button>
+          <button class="em-tab"     onclick="emShowTab('potential')">Potencial</button>
+          <button class="em-tab"     onclick="emShowTab('lorentz')">Lorentz</button>
+          <button class="em-tab"     onclick="emShowTab('faraday')">Faraday</button>
+          <button class="em-tab"     onclick="emShowTab('maxwell')">Maxwell</button>
+        </div>
+        <div id="em-pCoulomb"   class="em-panel on"></div>
+        <div id="em-pGauss"     class="em-panel"></div>
+        <div id="em-pPotential" class="em-panel"></div>
+        <div id="em-pLorentz"   class="em-panel"></div>
+        <div id="em-pFaraday"   class="em-panel"></div>
+        <div id="em-pMaxwell"   class="em-panel"></div>
+      </div>
     </div>
-    <div id="em-pCoulomb"   class="em-panel on"></div>
-    <div id="em-pGauss"     class="em-panel"></div>
-    <div id="em-pPotential" class="em-panel"></div>
-    <div id="em-pLorentz"   class="em-panel"></div>
-    <div id="em-pFaraday"   class="em-panel"></div>
-    <div id="em-pMaxwell"   class="em-panel"></div>
-  </div>
+
+  </div><!-- /.em-body-wrap -->
 </div>
 
 <!-- MATRICES & ECUACIONES LINEALES -->
