@@ -468,70 +468,16 @@ function toggleFigure(){
 
 // ── CANVAS COLOR HELPER ──────────────────────────────────────────────────
 // Lee variables CSS en runtime → el canvas respeta el tema activo
-// IMPORTANTE: debe estar ANTES de initTheme() para evitar TDZ en _root
+// IMPORTANTE: _root, _canvasColors y refreshCanvasColors deben estar
+// ANTES de initTheme() para evitar Temporal Dead Zone (TDZ)
 const _root = document.documentElement;
 function cssVar(name){
   return getComputedStyle(_root).getPropertyValue(name).trim() || name;
 }
 
-// ── THEME SYSTEM ──────────────────────────────────────────────────────────
-// Persiste en localStorage. Aplica data-theme="light"|"dark" al <html>.
-// El CSS hace el resto vía [data-theme="light"] selectors.
-
-function applyTheme(theme, animate = true){
-  const root   = document.documentElement;
-  const sw     = document.getElementById('theme-switch');
-  const knob   = document.getElementById('theme-knob');
-
-  if(animate){
-    // Micro-transición del knob ya está en CSS (cubic-bezier)
-    // Flash de opacidad en el body para suavizar el cambio de paleta
-    document.body.style.transition = 'background .3s, color .3s';
-  }
-
-  if(theme === 'light'){
-    root.setAttribute('data-theme', 'light');
-    if(sw) sw.setAttribute('aria-checked', 'true');
-  } else {
-    root.removeAttribute('data-theme');
-    if(sw) sw.setAttribute('aria-checked', 'false');
-  }
-
-  localStorage.setItem('sc-theme', theme);
-  // Refresh canvas colors para que el canvas respete el tema
-  if(typeof refreshCanvasColors === 'function') refreshCanvasColors();
-  // Refresh background formulas palette
-  if(typeof scBgRefreshTheme === 'function') scBgRefreshTheme();
-
-  // Actualizar el meta theme-color del navegador
-  const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if(metaTheme){
-    metaTheme.content = theme === 'light' ? '#fffdf7' : '#0a0f1a';
-  }
-}
-
-function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'light' ? 'dark' : 'light', true);
-  // Actualizar cache de colores del canvas y redibujar
-  setTimeout(() => {
-    refreshCanvasColors();
-    try { draw(); } catch(e){}   // canvas vectores
-    try { emDraw(); } catch(e){} // canvas EM
-  }, 50);
-}
-// ── END THEME SYSTEM ──────────────────────────────────────────────────────
-
-// Inicializar tema — DESPUÉS de declarar _root, cssVar y applyTheme
-(function initTheme(){
-  const saved = localStorage.getItem('sc-theme') || 'dark';
-  applyTheme(saved, false);
-})();
 // Colores de canvas pre-cacheados — se actualizan al cambiar tema
 let _canvasColors = {};
 function refreshCanvasColors(){
-  // Lee las variables --canvas-* que se definen en :root y [data-theme="light"]
-  // Esto hace que el canvas respete el tema sin lógica condicional aquí
   _canvasColors = {
     bg:        cssVar('--bg'),
     surface:   cssVar('--surface'),
@@ -546,8 +492,54 @@ function refreshCanvasColors(){
     canvasBg1: cssVar('--canvas-bg1'),
   };
 }
-// Inicializar y re-cachear al cambiar tema
-refreshCanvasColors();
+
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────
+// Persiste en localStorage. Aplica data-theme="light"|"dark" al <html>.
+// El CSS hace el resto vía [data-theme="light"] selectors.
+
+function applyTheme(theme, animate = true){
+  const root   = document.documentElement;
+  const sw     = document.getElementById('theme-switch');
+  const knob   = document.getElementById('theme-knob');
+
+  if(animate){
+    document.body.style.transition = 'background .3s, color .3s';
+  }
+
+  if(theme === 'light'){
+    root.setAttribute('data-theme', 'light');
+    if(sw) sw.setAttribute('aria-checked', 'true');
+  } else {
+    root.removeAttribute('data-theme');
+    if(sw) sw.setAttribute('aria-checked', 'false');
+  }
+
+  localStorage.setItem('sc-theme', theme);
+  refreshCanvasColors();
+  if(typeof scBgRefreshTheme === 'function') scBgRefreshTheme();
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if(metaTheme){
+    metaTheme.content = theme === 'light' ? '#fffdf7' : '#0a0f1a';
+  }
+}
+
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'light' ? 'dark' : 'light', true);
+  setTimeout(() => {
+    refreshCanvasColors();
+    try { draw(); } catch(e){}
+    try { emDraw(); } catch(e){}
+  }, 50);
+}
+// ── END THEME SYSTEM ──────────────────────────────────────────────────────
+
+// Inicializar tema — DESPUÉS de declarar _root, _canvasColors, refreshCanvasColors y applyTheme
+(function initTheme(){
+  const saved = localStorage.getItem('sc-theme') || 'dark';
+  applyTheme(saved, false);
+})();
 
 // ── SISTEMA DE NOTIFICACIONES (reemplaza alert()) ────────────────────────
 function scToast(msg, type='info', duration=3200){
