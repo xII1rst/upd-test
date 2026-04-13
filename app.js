@@ -2271,7 +2271,7 @@ function openSubmod(parent) {
   document.getElementById('submod-title').innerHTML = cfg.title;
   const cardsEl = document.getElementById('submod-cards');
   cardsEl.innerHTML = cfg.cards.map(c => `
-    <div class="submod-card ${c.cls} ${c.disabled?'disabled':''}" onclick="${c.disabled?'':'launchSubmod(\''+c.id+'\')'}" style="${c.disabled?'opacity:.4;cursor:default':''}">
+    <div class="submod-card ${c.cls} ${c.disabled?'disabled':''}" onclick="${c.disabled ? '' : `launchSubmod('${c.id}')`}" style="${c.disabled?'opacity:.4;cursor:default':''}">
       <div class="submod-icon">${c.icon}</div>
       <div class="submod-info">
         <div class="submod-name">${c.name}</div>
