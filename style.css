@@ -58,7 +58,7 @@ canvas:active{cursor:grabbing}
 #btn-reset:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ── BOTTOM PANEL — mobile ── */
-#bottom{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;transition:height .25s;max-height:55dvh;overflow:hidden;display:flex;flex-direction:column}
+#bottom{background:var(--surface);border-top:2px solid var(--border);flex-shrink:0}
 #bottom.collapsed{display:none}
 #panel-tog-wrap{display:flex;justify-content:flex-end;align-items:center;
   padding:5px 12px;background:var(--surface);border-top:1px solid var(--border)}

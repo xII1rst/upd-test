@@ -440,14 +440,15 @@ function mathTogSteps(sid,tog){
   const cb=body.closest('.collapsible-body');
   if(cb&&on) cb.style.maxHeight=(cb.scrollHeight+body.scrollHeight+40)+'px';
 }
-function togglePanel(){
-  if(window.innerWidth>=700) return; // en desktop el panel siempre visible
-  const bot=document.getElementById('bottom');
-  const btn=document.getElementById('panel-tog-btn');
+function _togglePanel(botId,btnId,resizeFn,desktopLock=false){
+  if(desktopLock&&window.innerWidth>=700)return;
+  const bot=document.getElementById(botId);
+  const btn=document.getElementById(btnId);
   const collapsed=bot.classList.toggle('collapsed');
   btn.classList.toggle('on',!collapsed);
-  setTimeout(()=>resize(),50);
+  setTimeout(resizeFn,50);
 }
+function togglePanel(){ _togglePanel('bottom','panel-tog-btn',resize,true); }
 function toggleFrac(){
   fracMode=!fracMode;
   document.getElementById('frac-tog').classList.toggle('on',fracMode);
@@ -1328,18 +1329,19 @@ ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.o
 // • El guard w && rect.width && rect.height evita el crop cuando el módulo no está visible.
 // • Math.round() en las dimensiones evita subpíxeles en pantallas HiDPI.
 // • NO llamar desde fuera de este módulo — el ResizeObserver ya lo dispara automáticamente.
-function resize(){
-  const w = document.getElementById('cw');
-  if(!w) return;
-  const rect = w.getBoundingClientRect();
-  if(!rect.width || !rect.height) return;
-  const dpr = window.devicePixelRatio || 1;
-  cv.width  = Math.round(rect.width  * dpr);
-  cv.height = Math.round(rect.height * dpr);
-  cv.style.width  = rect.width  + 'px';
-  cv.style.height = rect.height + 'px';
-  draw();
+function _resizeCanvas(cwId,canvas,drawFn){
+  const w=document.getElementById(cwId);
+  if(!w||!canvas)return;
+  const rect=w.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width =Math.round(rect.width *dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  canvas.style.width =rect.width +'px';
+  canvas.style.height=rect.height+'px';
+  drawFn();
 }
+function resize(){ _resizeCanvas('cw',cv,draw); }
 cv.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,rx:rotX,ry:rotY};});
 window.addEventListener('mousemove',e=>{if(!drag)return;if(mode===3){rotY=drag.ry+(e.clientX-drag.x)*.5;rotX=drag.rx-(e.clientY-drag.y)*.5;}draw();});
 window.addEventListener('mouseup',()=>{drag=null;});
@@ -1458,18 +1460,7 @@ function emInit(){
 const _emCwObserver = new ResizeObserver(() => { emResizeCanvas(); });
 
 // ⚠ WARNING: emResizeCanvas() — igual que resize() en AL, no llamar con layout pendiente.
-function emResizeCanvas(){
-  const cw = document.getElementById('em-cw');
-  if(!cw || !emCanvas) return;
-  const rect = cw.getBoundingClientRect();
-  if(!rect.width || !rect.height) return;
-  const dpr = window.devicePixelRatio || 1;
-  emCanvas.width  = Math.round(rect.width  * dpr);
-  emCanvas.height = Math.round(rect.height * dpr);
-  emCanvas.style.width  = rect.width  + 'px';
-  emCanvas.style.height = rect.height + 'px';
-  emDraw();
-}
+function emResizeCanvas(){ _resizeCanvas('em-cw',emCanvas,emDraw); }
 
 // ── 3D PROJECTION (same as AL) ────────────────────────
 // emP3() → alias de project3D() arriba
@@ -1587,13 +1578,7 @@ function emSetCoord(c){
 function emResetView(){
   emRotX=25; emRotY=-35; emScl=1; emDraw();
 }
-function emTogglePanel(){
-  const bot=document.getElementById('em-bottom');
-  const btn=document.getElementById('em-panel-tog-btn');
-  const collapsed=bot.classList.toggle('collapsed');
-  btn.classList.toggle('on',!collapsed);
-  setTimeout(()=>emResizeCanvas(),50);
-}
+function emTogglePanel(){ _togglePanel('em-bottom','em-panel-tog-btn',emResizeCanvas); }
 
 function emShowTab(tab){
   document.querySelectorAll('.em-tab').forEach((t,i)=>{
