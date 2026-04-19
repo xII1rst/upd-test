@@ -2038,16 +2038,16 @@ const SUBMOD_CONFIG = {
     title: '<span class="al-c">Álgebra</span> Lineal',
     cards: [
       { icon:'⟶', name:'Vectores 3D', desc:'Operaciones, graficación y cálculo vectorial', id:'vectors', cls:'al-sub' },
-      { icon:'▦',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
-      { icon:'≠',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
-      { icon:'Σ',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
+      { icon:'⊞',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
+      { icon:'≤',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
+      { icon:'∑',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
     ]
   },
   fi: {
     title: '<span class="fi-c">Física</span>',
     cards: [
       { icon:'⚡', name:'Electromagnetismo', desc:'Coulomb, Gauss, Lorentz, Faraday, Maxwell', id:'em', cls:'fi-sub' },
-      { icon:'🔜', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
+      { icon:'⚙', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
     ]
   },
   ca: {
@@ -2057,6 +2057,15 @@ const SUBMOD_CONFIG = {
       { icon:'∫', name:'Cálculo Integral', desc:'Integral indefinida, definida, series de Taylor', id:'calc', cls:'ca-sub' },
       { icon:'∇', name:'Cálculo Multivariable', desc:'Derivadas parciales, gradiente, integral doble', id:'calc', cls:'ca-sub' },
       { icon:'dy', name:'Ecuaciones Diferenciales', desc:'1er orden, lineal, 2do orden coef. constantes', id:'calc', cls:'ca-sub' },
+    ]
+  },
+  st: {
+    title: '<span class="st-c">Estadística</span>',
+    cards: [
+      { icon:'μ', name:'Estadística Descriptiva', desc:'Media, mediana, moda, varianza, desviación', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'P', name:'Probabilidad', desc:'Clásica, condicional, Bayes, combinatoria', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'∼', name:'Distribuciones', desc:'Normal, binomial, Poisson, t-Student', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'r²', name:'Regresión & Correlación', desc:'Lineal, múltiple, coeficiente de correlación', id:'soon', cls:'st-sub', disabled:true },
     ]
   }
 };
