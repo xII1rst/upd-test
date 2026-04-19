@@ -440,15 +440,14 @@ function mathTogSteps(sid,tog){
   const cb=body.closest('.collapsible-body');
   if(cb&&on) cb.style.maxHeight=(cb.scrollHeight+body.scrollHeight+40)+'px';
 }
-function _togglePanel(botId,btnId,resizeFn,desktopLock=false){
-  if(desktopLock&&window.innerWidth>=700)return;
-  const bot=document.getElementById(botId);
-  const btn=document.getElementById(btnId);
+function togglePanel(){
+  if(window.innerWidth>=700) return; // en desktop el panel siempre visible
+  const bot=document.getElementById('bottom');
+  const btn=document.getElementById('panel-tog-btn');
   const collapsed=bot.classList.toggle('collapsed');
   btn.classList.toggle('on',!collapsed);
-  setTimeout(resizeFn,50);
+  setTimeout(()=>resize(),50);
 }
-function togglePanel(){ _togglePanel('bottom','panel-tog-btn',resize,true); }
 function toggleFrac(){
   fracMode=!fracMode;
   document.getElementById('frac-tog').classList.toggle('on',fracMode);
@@ -1329,19 +1328,18 @@ ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.o
 // • El guard w && rect.width && rect.height evita el crop cuando el módulo no está visible.
 // • Math.round() en las dimensiones evita subpíxeles en pantallas HiDPI.
 // • NO llamar desde fuera de este módulo — el ResizeObserver ya lo dispara automáticamente.
-function _resizeCanvas(cwId,canvas,drawFn){
-  const w=document.getElementById(cwId);
-  if(!w||!canvas)return;
-  const rect=w.getBoundingClientRect();
-  if(!rect.width||!rect.height)return;
-  const dpr=window.devicePixelRatio||1;
-  canvas.width =Math.round(rect.width *dpr);
-  canvas.height=Math.round(rect.height*dpr);
-  canvas.style.width =rect.width +'px';
-  canvas.style.height=rect.height+'px';
-  drawFn();
+function resize(){
+  const w = document.getElementById('cw');
+  if(!w) return;
+  const rect = w.getBoundingClientRect();
+  if(!rect.width || !rect.height) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width  = Math.round(rect.width  * dpr);
+  cv.height = Math.round(rect.height * dpr);
+  cv.style.width  = rect.width  + 'px';
+  cv.style.height = rect.height + 'px';
+  draw();
 }
-function resize(){ _resizeCanvas('cw',cv,draw); }
 cv.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,rx:rotX,ry:rotY};});
 window.addEventListener('mousemove',e=>{if(!drag)return;if(mode===3){rotY=drag.ry+(e.clientX-drag.x)*.5;rotX=drag.rx-(e.clientY-drag.y)*.5;}draw();});
 window.addEventListener('mouseup',()=>{drag=null;});
@@ -1460,7 +1458,18 @@ function emInit(){
 const _emCwObserver = new ResizeObserver(() => { emResizeCanvas(); });
 
 // ⚠ WARNING: emResizeCanvas() — igual que resize() en AL, no llamar con layout pendiente.
-function emResizeCanvas(){ _resizeCanvas('em-cw',emCanvas,emDraw); }
+function emResizeCanvas(){
+  const cw = document.getElementById('em-cw');
+  if(!cw || !emCanvas) return;
+  const rect = cw.getBoundingClientRect();
+  if(!rect.width || !rect.height) return;
+  const dpr = window.devicePixelRatio || 1;
+  emCanvas.width  = Math.round(rect.width  * dpr);
+  emCanvas.height = Math.round(rect.height * dpr);
+  emCanvas.style.width  = rect.width  + 'px';
+  emCanvas.style.height = rect.height + 'px';
+  emDraw();
+}
 
 // ── 3D PROJECTION (same as AL) ────────────────────────
 // emP3() → alias de project3D() arriba
@@ -1578,7 +1587,13 @@ function emSetCoord(c){
 function emResetView(){
   emRotX=25; emRotY=-35; emScl=1; emDraw();
 }
-function emTogglePanel(){ _togglePanel('em-bottom','em-panel-tog-btn',emResizeCanvas); }
+function emTogglePanel(){
+  const bot=document.getElementById('em-bottom');
+  const btn=document.getElementById('em-panel-tog-btn');
+  const collapsed=bot.classList.toggle('collapsed');
+  btn.classList.toggle('on',!collapsed);
+  setTimeout(()=>emResizeCanvas(),50);
+}
 
 function emShowTab(tab){
   document.querySelectorAll('.em-tab').forEach((t,i)=>{
@@ -1967,16 +1982,16 @@ const SUBMOD_CONFIG = {
     title: '<span class="al-c">Álgebra</span> Lineal',
     cards: [
       { icon:'⟶', name:'Vectores 3D', desc:'Operaciones, graficación y cálculo vectorial', id:'vectors', cls:'al-sub' },
-      { icon:'▦',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
-      { icon:'≠',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
-      { icon:'Σ',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
+      { icon:'⊞',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
+      { icon:'≤',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
+      { icon:'∑',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
     ]
   },
   fi: {
     title: '<span class="fi-c">Física</span>',
     cards: [
       { icon:'⚡', name:'Electromagnetismo', desc:'Coulomb, Gauss, Lorentz, Faraday, Maxwell', id:'em', cls:'fi-sub' },
-      { icon:'🔜', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
+      { icon:'⚙', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
     ]
   },
   ca: {
@@ -1986,6 +2001,15 @@ const SUBMOD_CONFIG = {
       { icon:'∫', name:'Cálculo Integral', desc:'Integral indefinida, definida, series de Taylor', id:'calc', cls:'ca-sub' },
       { icon:'∇', name:'Cálculo Multivariable', desc:'Derivadas parciales, gradiente, integral doble', id:'calc', cls:'ca-sub' },
       { icon:'dy', name:'Ecuaciones Diferenciales', desc:'1er orden, lineal, 2do orden coef. constantes', id:'calc', cls:'ca-sub' },
+    ]
+  },
+  st: {
+    title: '<span class="st-c">Estadística</span>',
+    cards: [
+      { icon:'μ', name:'Estadística Descriptiva', desc:'Media, mediana, moda, varianza, desviación', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'P', name:'Probabilidad', desc:'Clásica, condicional, Bayes, combinatoria', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'∼', name:'Distribuciones', desc:'Normal, binomial, Poisson, t-Student', id:'soon', cls:'st-sub', disabled:true },
+      { icon:'r²', name:'Regresión & Correlación', desc:'Lineal, múltiple, coeficiente de correlación', id:'soon', cls:'st-sub', disabled:true },
     ]
   }
 };
@@ -2106,11 +2130,14 @@ function openSubmod(parent) {
       + '<div class="submod-arrow">' + (c.disabled ? '' : '›') + '</div>'
       + '</div>';
   }).join('');
+  // Glow ambiental por módulo
+  const screen = document.getElementById('submod-screen');
+  screen.dataset.mod = parent;
   const launcher = document.getElementById('launcher');
   launcher.classList.add('hidden');
   setTimeout(() => {
     launcher.style.display = 'none';
-    document.getElementById('submod-screen').classList.add('visible');
+    screen.classList.add('visible');
   }, 300);
   navPush({sc:'submod', parent});
 }
