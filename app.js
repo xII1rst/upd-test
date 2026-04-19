@@ -82,11 +82,11 @@
   // Configuración de las 3 capas
   const LAYERS = [
     // Capa 0: fondo — grandes, muy tenues, muy lentas
-    { count: 0.3, sizeMin:18, sizeMax:32, opMin:.016, opMax:.038, speedX:.12, speedY:.06 },
+    { count: 0.3, sizeMin:18, sizeMax:32, opMin:.022, opMax:.055, speedX:.12, speedY:.06 },
     // Capa 1: intermedio — medianas, velocidad media
-    { count: 0.45, sizeMin:10, sizeMax:18, opMin:.028, opMax:.065, speedX:.24, speedY:.13 },
+    { count: 0.45, sizeMin:10, sizeMax:18, opMin:.04,  opMax:.09,  speedX:.24, speedY:.13 },
     // Capa 2: primer plano — pequeñas, más visibles, más rápidas
-    { count: 0.25, sizeMin:7,  sizeMax:12, opMin:.038, opMax:.092, speedX:.38, speedY:.20 },
+    { count: 0.25, sizeMin:7,  sizeMax:12, opMin:.055, opMax:.13,  speedX:.38, speedY:.20 },
   ];
 
   let items = [];
@@ -151,9 +151,9 @@
       ctx.restore();
     });
     // Depth fog — vignette radial para empujar el foco al centro
-    const fog = ctx.createRadialGradient(W/2, H/2, W*0.28, W/2, H/2, W*0.82);
+    const fog = ctx.createRadialGradient(W/2, H/2, W*0.32, W/2, H/2, W*0.85);
     fog.addColorStop(0, 'rgba(0,0,0,0)');
-    fog.addColorStop(1, 'rgba(0,0,0,0.55)');
+    fog.addColorStop(1, 'rgba(0,0,0,0.32)');
     ctx.fillStyle = fog;
     ctx.fillRect(0, 0, W, H);
   }
@@ -239,9 +239,9 @@
                 : card.classList.contains('ca') ? 'ca'
                 : card.classList.contains('st') ? 'st' : null;
       if(!mod) return;
-      card.addEventListener('mouseenter', () => { targetSpeed = 2.8; setElectronColors(mod); });
+      card.addEventListener('mouseenter', () => { targetSpeed = 1.6; setElectronColors(mod); });
       card.addEventListener('mouseleave', () => { targetSpeed = 1; setElectronColors('default'); });
-      card.addEventListener('touchstart', () => { targetSpeed = 2.8; setElectronColors(mod); }, {passive:true});
+      card.addEventListener('touchstart', () => { targetSpeed = 1.6; setElectronColors(mod); }, {passive:true});
       card.addEventListener('touchend',   () => { setTimeout(()=>{ targetSpeed=1; setElectronColors('default'); }, 600); }, {passive:true});
     });
   }
