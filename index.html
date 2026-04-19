@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0a0f1a"/>
 <title>SuperCalc</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css?v=1111e">
+<link rel="stylesheet" href="style.css?v=1111f">
 </head>
 <body>
 <canvas id="sc-bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
@@ -83,7 +83,7 @@
     <div class="sc-logo-sub">Motor de cálculo científico</div>
     <div class="sc-logo-ver">v 1.11.0</div>
   </div>
-  <div class="launcher-modules" style="flex-wrap:wrap;justify-content:center">
+  <div class="launcher-modules">
     <div class="lmod-card al" onclick="openSubmod('al')">
       <div class="lmod-icon">𝑨</div>
       <div class="lmod-name">Álgebra Lineal</div>
@@ -98,6 +98,11 @@
       <div class="lmod-icon">∫</div>
       <div class="lmod-name">Cálculo</div>
       <div class="lmod-badge ca">CAL</div>
+    </div>
+    <div class="lmod-card st" onclick="openSubmod('st')">
+      <div class="lmod-icon">μ̄</div>
+      <div class="lmod-name">Estadística</div>
+      <div class="lmod-badge st">EST</div>
     </div>
   </div>
 
@@ -638,7 +643,7 @@
     <!-- Derivada explícita -->
     <div class="calc-card" id="card-der">
       <div class="calc-card-header" onclick="toggleCard('der')">
-        <div class="calc-card-icon sm">d/dx</div>
+        <div class="calc-card-icon">d/dx</div>
         <div class="calc-card-info">
           <div class="calc-card-name">Derivada Explícita</div>
           <div class="calc-card-desc">f'(x) simbólica — reglas de derivación</div>
@@ -747,7 +752,7 @@
     <!-- Análisis -->
     <div class="calc-card" id="card-ana">
       <div class="calc-card-header" onclick="toggleCard('ana')">
-        <div class="calc-card-icon">f(x)</div>
+        <div class="calc-card-icon">📊</div>
         <div class="calc-card-info">
           <div class="calc-card-name">Análisis de Función</div>
           <div class="calc-card-desc">Monotonía, extremos, concavidad, inflexiones</div>
@@ -979,7 +984,7 @@
 
     <div class="calc-card" id="card-sep">
       <div class="calc-card-header" onclick="toggleCard('sep')">
-        <div class="calc-card-icon sm">dy/dx</div>
+        <div class="calc-card-icon">dy/dx</div>
         <div class="calc-card-info">
           <div class="calc-card-name">1er Orden — Variables Separables</div>
           <div class="calc-card-desc">dy/dx = f(x)·g(y) con condición inicial</div>
@@ -1009,7 +1014,7 @@
 
     <div class="calc-card" id="card-edolin">
       <div class="calc-card-header" onclick="toggleCard('edolin')">
-        <div class="calc-card-icon sm">μ(x)</div>
+        <div class="calc-card-icon">μ(x)</div>
         <div class="calc-card-info">
           <div class="calc-card-name">1er Orden — ED Lineal</div>
           <div class="calc-card-desc">y' + P(x)y = Q(x) — factor integrante</div>
@@ -1043,7 +1048,7 @@
 
     <div class="calc-card" id="card-edo2">
       <div class="calc-card-header" onclick="toggleCard('edo2')">
-        <div class="calc-card-icon sm">ay''</div>
+        <div class="calc-card-icon">ay''</div>
         <div class="calc-card-info">
           <div class="calc-card-name">2do Orden — Coef. Constantes</div>
           <div class="calc-card-desc">ay'' + by' + cy = 0 — ecuación característica</div>
