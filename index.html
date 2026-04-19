@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0a0f1a"/>
 <title>SuperCalc</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css?v=1111a">
+<link rel="stylesheet" href="style.css?v=1111b">
 </head>
 <body>
 <canvas id="sc-bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
@@ -160,13 +160,13 @@
     <button id="btn-reset" onclick="resetView()">↺ Reset</button>
   </div>
 
-  <div id="bottom">
-    <div id="panel-tog-wrap">
-      <div id="panel-tog-btn" class="on" onclick="togglePanel()">
-        <span class="tog-lbl" id="panel-tog-lbl">Panel</span>
-        <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
-      </div>
+  <div id="panel-tog-wrap">
+    <div id="panel-tog-btn" class="on" onclick="togglePanel()">
+      <span class="tog-lbl" id="panel-tog-lbl">Panel</span>
+      <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
     </div>
+  </div>
+  <div id="bottom">
     <div class="tabs">
       <button class="tab on" onclick="showTab('V')">Vectores</button>
       <button class="tab" onclick="showTab('M')">Cálculos</button>
@@ -302,42 +302,35 @@
     </div>
   </div>
 
-  <div class="em-body-wrap">
+  <div id="em-cw">
+    <canvas id="em-canvas"></canvas>
+    <div id="em-legend-canvas"></div>
+    <button id="btn-em-reset" onclick="emResetView()" style="position:absolute;top:10px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:11px;font-family:Space Mono,monospace;padding:6px 12px;cursor:pointer;letter-spacing:.04em;transition:all .2s">↺ Reset</button>
+  </div>
 
-    <div class="em-canvas-area">
-      <div id="em-cw">
-        <canvas id="em-canvas"></canvas>
-        <div id="em-legend-canvas"></div>
-        <button id="btn-em-reset" onclick="emResetView()">↺ Reset</button>
-      </div>
+  <div class="em-panel-tog-wrap">
+    <div id="em-panel-tog-btn" class="on" onclick="emTogglePanel()">
+      <span class="tog-lbl">Panel</span>
+      <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
     </div>
+  </div>
 
-    <div class="em-panel-area">
-      <div class="em-panel-tog-wrap">
-        <div id="em-panel-tog-btn" class="on" onclick="emTogglePanel()">
-          <span class="tog-lbl">Panel</span>
-          <div class="sw"><div class="sw-track"></div><div class="sw-knob"></div></div>
-        </div>
-      </div>
-      <div id="em-bottom">
-        <div class="em-tabs">
-          <button class="em-tab on"  onclick="emShowTab('coulomb')">Coulomb</button>
-          <button class="em-tab"     onclick="emShowTab('gauss')">Gauss</button>
-          <button class="em-tab"     onclick="emShowTab('potential')">Potencial</button>
-          <button class="em-tab"     onclick="emShowTab('lorentz')">Lorentz</button>
-          <button class="em-tab"     onclick="emShowTab('faraday')">Faraday</button>
-          <button class="em-tab"     onclick="emShowTab('maxwell')">Maxwell</button>
-        </div>
-        <div id="em-pCoulomb"   class="em-panel on"></div>
-        <div id="em-pGauss"     class="em-panel"></div>
-        <div id="em-pPotential" class="em-panel"></div>
-        <div id="em-pLorentz"   class="em-panel"></div>
-        <div id="em-pFaraday"   class="em-panel"></div>
-        <div id="em-pMaxwell"   class="em-panel"></div>
-      </div>
+  <div id="em-bottom">
+    <div class="em-tabs">
+      <button class="em-tab on"  onclick="emShowTab('coulomb')">Coulomb</button>
+      <button class="em-tab"     onclick="emShowTab('gauss')">Gauss</button>
+      <button class="em-tab"     onclick="emShowTab('potential')">Potencial</button>
+      <button class="em-tab"     onclick="emShowTab('lorentz')">Lorentz</button>
+      <button class="em-tab"     onclick="emShowTab('faraday')">Faraday</button>
+      <button class="em-tab"     onclick="emShowTab('maxwell')">Maxwell</button>
     </div>
-
-  </div><!-- /.em-body-wrap -->
+    <div id="em-pCoulomb"   class="em-panel on"></div>
+    <div id="em-pGauss"     class="em-panel"></div>
+    <div id="em-pPotential" class="em-panel"></div>
+    <div id="em-pLorentz"   class="em-panel"></div>
+    <div id="em-pFaraday"   class="em-panel"></div>
+    <div id="em-pMaxwell"   class="em-panel"></div>
+  </div>
 </div>
 
 <!-- MATRICES & ECUACIONES LINEALES -->
