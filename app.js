@@ -82,11 +82,11 @@
   // Configuración de las 3 capas
   const LAYERS = [
     // Capa 0: fondo — grandes, muy tenues, muy lentas
-    { count: 0.3, sizeMin:18, sizeMax:32, opMin:.022, opMax:.055, speedX:.12, speedY:.06 },
+    { count: 0.3, sizeMin:18, sizeMax:32, opMin:.016, opMax:.038, speedX:.12, speedY:.06 },
     // Capa 1: intermedio — medianas, velocidad media
-    { count: 0.45, sizeMin:10, sizeMax:18, opMin:.04,  opMax:.09,  speedX:.24, speedY:.13 },
+    { count: 0.45, sizeMin:10, sizeMax:18, opMin:.028, opMax:.065, speedX:.24, speedY:.13 },
     // Capa 2: primer plano — pequeñas, más visibles, más rápidas
-    { count: 0.25, sizeMin:7,  sizeMax:12, opMin:.055, opMax:.13,  speedX:.38, speedY:.20 },
+    { count: 0.25, sizeMin:7,  sizeMax:12, opMin:.038, opMax:.092, speedX:.38, speedY:.20 },
   ];
 
   let items = [];
@@ -150,6 +150,12 @@
       ctx.fillText(it.text, 0, 0);
       ctx.restore();
     });
+    // Depth fog — vignette radial para empujar el foco al centro
+    const fog = ctx.createRadialGradient(W/2, H/2, W*0.28, W/2, H/2, W*0.82);
+    fog.addColorStop(0, 'rgba(0,0,0,0)');
+    fog.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, 0, W, H);
   }
 
   function update(){
@@ -198,11 +204,61 @@
     { el: e2, rot:  60*Math.PI/180,   angle: 2.1, speed: 0.010 },
     { el: e3, rot: -60*Math.PI/180,   angle: 4.2, speed: 0.011 },
   ];
+  const MODULE_COLORS = {
+    al: { e1:'#a594ff', e2:'#7c6af7', e3:'#f0c040' },
+    fi: { e1:'#22d3ee', e2:'#67e8f9', e3:'#4da6ff' },
+    ca: { e1:'#34d399', e2:'#10b981', e3:'#f0c040' },
+    st: { e1:'#fb923c', e2:'#f97316', e3:'#fbbf24' },
+    default: { e1:'#a594ff', e2:'#67e8f9', e3:'#f0c040' },
+  };
+  let targetSpeed = 1;
+  let currentSpeed = 1;
+
+  function setElectronColors(mod){
+    const c = MODULE_COLORS[mod] || MODULE_COLORS.default;
+    // e1 → ∑ (violeta), e2 → π (cian), e3 → ∂ (dorado)
+    const e1text = e1.querySelector('text');
+    const e1circ = e1.querySelector('circle');
+    const e2text = e2.querySelector('text');
+    const e2circ = e2.querySelector('circle');
+    const e3text = e3.querySelector('text');
+    const e3circ = e3.querySelector('circle');
+    if(e1text){ e1text.style.transition='fill .4s'; e1text.style.fill=c.e1; }
+    if(e1circ){ e1circ.style.transition='stroke .4s'; e1circ.style.stroke=c.e1; }
+    if(e2text){ e2text.style.transition='fill .4s'; e2text.style.fill=c.e2; }
+    if(e2circ){ e2circ.style.transition='stroke .4s'; e2circ.style.stroke=c.e2; }
+    if(e3text){ e3text.style.transition='fill .4s'; e3text.style.fill=c.e3; }
+    if(e3circ){ e3circ.style.transition='stroke .4s'; e3circ.style.stroke=c.e3; }
+  }
+
+  // Hookear hover en lmod-cards
+  function hookCards(){
+    document.querySelectorAll('.lmod-card').forEach(card => {
+      const mod = card.classList.contains('al') ? 'al'
+                : card.classList.contains('fi') ? 'fi'
+                : card.classList.contains('ca') ? 'ca'
+                : card.classList.contains('st') ? 'st' : null;
+      if(!mod) return;
+      card.addEventListener('mouseenter', () => { targetSpeed = 2.8; setElectronColors(mod); });
+      card.addEventListener('mouseleave', () => { targetSpeed = 1; setElectronColors('default'); });
+      card.addEventListener('touchstart', () => { targetSpeed = 2.8; setElectronColors(mod); }, {passive:true});
+      card.addEventListener('touchend',   () => { setTimeout(()=>{ targetSpeed=1; setElectronColors('default'); }, 600); }, {passive:true});
+    });
+  }
+  // Esperar a que el DOM esté listo
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', hookCards);
+  } else {
+    setTimeout(hookCards, 100);
+  }
+
   let t = 0;
   function frame(){
     t++;
+    // Suavizar la transición de velocidad
+    currentSpeed += (targetSpeed - currentSpeed) * 0.06;
     orbits.forEach(o => {
-      const a = o.angle + t * o.speed;
+      const a = o.angle + t * o.speed * currentSpeed;
       const lx = RX * Math.cos(a), ly = RY * Math.sin(a);
       const c = Math.cos(o.rot), s = Math.sin(o.rot);
       o.el.setAttribute('transform',
@@ -1982,16 +2038,16 @@ const SUBMOD_CONFIG = {
     title: '<span class="al-c">Álgebra</span> Lineal',
     cards: [
       { icon:'⟶', name:'Vectores 3D', desc:'Operaciones, graficación y cálculo vectorial', id:'vectors', cls:'al-sub' },
-      { icon:'⊞',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
-      { icon:'≤',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
-      { icon:'∑',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
+      { icon:'▦',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
+      { icon:'≠',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
+      { icon:'Σ',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
     ]
   },
   fi: {
     title: '<span class="fi-c">Física</span>',
     cards: [
       { icon:'⚡', name:'Electromagnetismo', desc:'Coulomb, Gauss, Lorentz, Faraday, Maxwell', id:'em', cls:'fi-sub' },
-      { icon:'⚙', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
+      { icon:'🔜', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
     ]
   },
   ca: {
@@ -2001,15 +2057,6 @@ const SUBMOD_CONFIG = {
       { icon:'∫', name:'Cálculo Integral', desc:'Integral indefinida, definida, series de Taylor', id:'calc', cls:'ca-sub' },
       { icon:'∇', name:'Cálculo Multivariable', desc:'Derivadas parciales, gradiente, integral doble', id:'calc', cls:'ca-sub' },
       { icon:'dy', name:'Ecuaciones Diferenciales', desc:'1er orden, lineal, 2do orden coef. constantes', id:'calc', cls:'ca-sub' },
-    ]
-  },
-  st: {
-    title: '<span class="st-c">Estadística</span>',
-    cards: [
-      { icon:'μ', name:'Estadística Descriptiva', desc:'Media, mediana, moda, varianza, desviación', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'P', name:'Probabilidad', desc:'Clásica, condicional, Bayes, combinatoria', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'∼', name:'Distribuciones', desc:'Normal, binomial, Poisson, t-Student', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'r²', name:'Regresión & Correlación', desc:'Lineal, múltiple, coeficiente de correlación', id:'soon', cls:'st-sub', disabled:true },
     ]
   }
 };
@@ -2058,6 +2105,42 @@ window.addEventListener('load', () => {
   history.replaceState({sc:'launcher'}, '');
   history.pushState({sc:'base'}, '');
   setAuthorVisible(true);
+
+  // ── Ripple físico en lmod-cards ──
+  document.querySelectorAll('.lmod-card').forEach(card => {
+    card.addEventListener('click', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const size = Math.max(rect.width, rect.height);
+      const ripple = document.createElement('span');
+      ripple.className = 'sc-ripple';
+      const mod = card.classList.contains('al') ? 'var(--al)'
+                : card.classList.contains('fi') ? 'var(--fi)'
+                : card.classList.contains('ca') ? 'var(--ca)'
+                : 'var(--st)';
+      Object.assign(ripple.style, {
+        width: size + 'px', height: size + 'px',
+        left: (x - size/2) + 'px', top: (y - size/2) + 'px',
+        background: mod, opacity: '0.18',
+      });
+      card.appendChild(ripple);
+      ripple.addEventListener('animationend', () => ripple.remove());
+    });
+
+    // ── Parallax interno del ícono al mousemove ──
+    const icon = card.querySelector('.lmod-icon');
+    card.addEventListener('mousemove', e => {
+      if(!icon) return;
+      const rect = card.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width  - 0.5;
+      const cy = (e.clientY - rect.top)  / rect.height - 0.5;
+      icon.style.transform = `scale(1.2) translateY(-3px) translate(${cx*8}px, ${cy*6}px)`;
+    });
+    card.addEventListener('mouseleave', e => {
+      if(icon) icon.style.transform = '';
+    });
+  });
 
   // Delegated click para submod-cards generadas dinamicamente
   document.getElementById('submod-cards').addEventListener('click', function(e) {
@@ -2130,14 +2213,11 @@ function openSubmod(parent) {
       + '<div class="submod-arrow">' + (c.disabled ? '' : '›') + '</div>'
       + '</div>';
   }).join('');
-  // Glow ambiental por módulo
-  const screen = document.getElementById('submod-screen');
-  screen.dataset.mod = parent;
   const launcher = document.getElementById('launcher');
   launcher.classList.add('hidden');
   setTimeout(() => {
     launcher.style.display = 'none';
-    screen.classList.add('visible');
+    document.getElementById('submod-screen').classList.add('visible');
   }, 300);
   navPush({sc:'submod', parent});
 }
