@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0a0f1a"/>
 <title>SuperCalc</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css?v=1111i">
+<link rel="stylesheet" href="style.css?v=1111e">
 </head>
 <body>
 <canvas id="sc-bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
@@ -83,7 +83,7 @@
     <div class="sc-logo-sub">Motor de cálculo científico</div>
     <div class="sc-logo-ver">v 1.11.0</div>
   </div>
-  <div class="launcher-modules">
+  <div class="launcher-modules" style="flex-wrap:wrap;justify-content:center">
     <div class="lmod-card al" onclick="openSubmod('al')">
       <div class="lmod-icon">𝑨</div>
       <div class="lmod-name">Álgebra Lineal</div>
@@ -98,11 +98,6 @@
       <div class="lmod-icon">∫</div>
       <div class="lmod-name">Cálculo</div>
       <div class="lmod-badge ca">CAL</div>
-    </div>
-    <div class="lmod-card st" onclick="openSubmod('st')">
-      <div class="lmod-icon">μ̄</div>
-      <div class="lmod-name">Estadística</div>
-      <div class="lmod-badge st">EST</div>
     </div>
   </div>
 
@@ -565,11 +560,12 @@
         <div class="calc-card-inner">
           <!-- Límite simple -->
           <div class="calc-field-row">
-            <label>f(x) =</label>
-            <input class="calc-inp" id="dif-lim-fx" placeholder="ej: sin(x)/x, (x^2-4)/(x-2)"/>
+            <label>f(var) =</label>
+            <input class="calc-inp" id="dif-lim-fx" placeholder="ej: sin(x)/x, (4*t^2-9)/(2*t-3)"/>
           </div>
           <div class="calc-field-row">
-            <label>x →</label>
+            <input class="calc-inp calc-inp-var" id="dif-lim-var" value="x" maxlength="3" title="Variable (x, t, θ...)"/>
+            <label>→</label>
             <input class="calc-inp calc-inp-sm" id="dif-lim-a" placeholder="ej: 0, π/4, ln(2)"/>
             <label>Lado:</label>
             <select class="mat-sel" id="dif-lim-side">
@@ -593,11 +589,12 @@
               <div class="app-panel">
                 <div class="app-panel-title">Límite A</div>
                 <div class="calc-field-row">
-                  <label>f(x) =</label>
+                  <label>f(var) =</label>
                   <input class="calc-inp" id="lim-op-fx1" placeholder="ej: x^2"/>
                 </div>
                 <div class="calc-field-row">
-                  <label>x →</label>
+                  <input class="calc-inp calc-inp-var" id="lim-op-var1" value="x" maxlength="3" title="Variable"/>
+                  <label>→</label>
                   <input class="calc-inp calc-inp-sm" id="lim-op-a1" placeholder="0"/>
                   <select class="mat-sel" id="lim-op-side1">
                     <option value="both">Bilateral</option>
@@ -617,11 +614,12 @@
               <div class="app-panel">
                 <div class="app-panel-title">Límite B</div>
                 <div class="calc-field-row">
-                  <label>f(x) =</label>
+                  <label>f(var) =</label>
                   <input class="calc-inp" id="lim-op-fx2" placeholder="ej: sin(x)/x"/>
                 </div>
                 <div class="calc-field-row">
-                  <label>x →</label>
+                  <input class="calc-inp calc-inp-var" id="lim-op-var2" value="x" maxlength="3" title="Variable"/>
+                  <label>→</label>
                   <input class="calc-inp calc-inp-sm" id="lim-op-a2" placeholder="0"/>
                   <select class="mat-sel" id="lim-op-side2">
                     <option value="both">Bilateral</option>
@@ -643,7 +641,7 @@
     <!-- Derivada explícita -->
     <div class="calc-card" id="card-der">
       <div class="calc-card-header" onclick="toggleCard('der')">
-        <div class="calc-card-icon">d/dx</div>
+        <div class="calc-card-icon sm">d/dx</div>
         <div class="calc-card-info">
           <div class="calc-card-name">Derivada Explícita</div>
           <div class="calc-card-desc">f'(x) simbólica — reglas de derivación</div>
@@ -653,17 +651,19 @@
       <div class="calc-card-body" id="body-der">
         <div class="calc-card-inner">
           <div class="calc-field-row">
-            <label>f(x) =</label>
+            <label>f(var) =</label>
             <input class="calc-inp" id="dif-der-fx" placeholder="ej: 2*x^25"/>
           </div>
           <div class="calc-field-row">
+            <label>Var:</label>
+            <input class="calc-inp calc-inp-var" id="dif-der-var" value="x" maxlength="3" title="Variable (x, t, θ...)"/>
             <label>Orden:</label>
             <select class="mat-sel" id="dif-der-ord">
               <option value="1">Primera (f')</option>
               <option value="2">Segunda (f'')</option>
               <option value="3">Tercera (f''')</option>
             </select>
-            <label>Evaluar en x =</label>
+            <label>Eval en var =</label>
             <input class="calc-inp calc-inp-sm" id="dif-der-pt" placeholder="opcional"/>
           </div>
           <div class="calc-btn-row">
@@ -752,7 +752,7 @@
     <!-- Análisis -->
     <div class="calc-card" id="card-ana">
       <div class="calc-card-header" onclick="toggleCard('ana')">
-        <div class="calc-card-icon">📊</div>
+        <div class="calc-card-icon">f(x)</div>
         <div class="calc-card-info">
           <div class="calc-card-name">Análisis de Función</div>
           <div class="calc-card-desc">Monotonía, extremos, concavidad, inflexiones</div>
@@ -984,7 +984,7 @@
 
     <div class="calc-card" id="card-sep">
       <div class="calc-card-header" onclick="toggleCard('sep')">
-        <div class="calc-card-icon">dy/dx</div>
+        <div class="calc-card-icon sm">dy/dx</div>
         <div class="calc-card-info">
           <div class="calc-card-name">1er Orden — Variables Separables</div>
           <div class="calc-card-desc">dy/dx = f(x)·g(y) con condición inicial</div>
@@ -1014,7 +1014,7 @@
 
     <div class="calc-card" id="card-edolin">
       <div class="calc-card-header" onclick="toggleCard('edolin')">
-        <div class="calc-card-icon">μ(x)</div>
+        <div class="calc-card-icon sm">μ(x)</div>
         <div class="calc-card-info">
           <div class="calc-card-name">1er Orden — ED Lineal</div>
           <div class="calc-card-desc">y' + P(x)y = Q(x) — factor integrante</div>
@@ -1048,7 +1048,7 @@
 
     <div class="calc-card" id="card-edo2">
       <div class="calc-card-header" onclick="toggleCard('edo2')">
-        <div class="calc-card-icon">ay''</div>
+        <div class="calc-card-icon sm">ay''</div>
         <div class="calc-card-info">
           <div class="calc-card-name">2do Orden — Coef. Constantes</div>
           <div class="calc-card-desc">ay'' + by' + cy = 0 — ecuación característica</div>
@@ -1137,8 +1137,8 @@
 </div>
 </div>
 
-<div id="sc-author-footer">• Rafael Miranda •</div>
+<div id="sc-author-footer">Ing. Rafael Miranda &nbsp;·&nbsp; (xII1rst)</div>
 
-<script src="app.js?v=1111i"></script>
+<script src="app.js?v=1111a"></script>
 </body>
 </html>

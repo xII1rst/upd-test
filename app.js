@@ -150,12 +150,6 @@
       ctx.fillText(it.text, 0, 0);
       ctx.restore();
     });
-    // Depth fog — vignette radial para empujar el foco al centro
-    const fog = ctx.createRadialGradient(W/2, H/2, W*0.32, W/2, H/2, W*0.85);
-    fog.addColorStop(0, 'rgba(0,0,0,0)');
-    fog.addColorStop(1, 'rgba(0,0,0,0.32)');
-    ctx.fillStyle = fog;
-    ctx.fillRect(0, 0, W, H);
   }
 
   function update(){
@@ -204,61 +198,11 @@
     { el: e2, rot:  60*Math.PI/180,   angle: 2.1, speed: 0.010 },
     { el: e3, rot: -60*Math.PI/180,   angle: 4.2, speed: 0.011 },
   ];
-  const MODULE_COLORS = {
-    al: { e1:'#a594ff', e2:'#7c6af7', e3:'#f0c040' },
-    fi: { e1:'#22d3ee', e2:'#67e8f9', e3:'#4da6ff' },
-    ca: { e1:'#34d399', e2:'#10b981', e3:'#f0c040' },
-    st: { e1:'#fb923c', e2:'#f97316', e3:'#fbbf24' },
-    default: { e1:'#a594ff', e2:'#67e8f9', e3:'#f0c040' },
-  };
-  let targetSpeed = 1;
-  let currentSpeed = 1;
-
-  function setElectronColors(mod){
-    const c = MODULE_COLORS[mod] || MODULE_COLORS.default;
-    // e1 → ∑ (violeta), e2 → π (cian), e3 → ∂ (dorado)
-    const e1text = e1.querySelector('text');
-    const e1circ = e1.querySelector('circle');
-    const e2text = e2.querySelector('text');
-    const e2circ = e2.querySelector('circle');
-    const e3text = e3.querySelector('text');
-    const e3circ = e3.querySelector('circle');
-    if(e1text){ e1text.style.transition='fill .4s'; e1text.style.fill=c.e1; }
-    if(e1circ){ e1circ.style.transition='stroke .4s'; e1circ.style.stroke=c.e1; }
-    if(e2text){ e2text.style.transition='fill .4s'; e2text.style.fill=c.e2; }
-    if(e2circ){ e2circ.style.transition='stroke .4s'; e2circ.style.stroke=c.e2; }
-    if(e3text){ e3text.style.transition='fill .4s'; e3text.style.fill=c.e3; }
-    if(e3circ){ e3circ.style.transition='stroke .4s'; e3circ.style.stroke=c.e3; }
-  }
-
-  // Hookear hover en lmod-cards
-  function hookCards(){
-    document.querySelectorAll('.lmod-card').forEach(card => {
-      const mod = card.classList.contains('al') ? 'al'
-                : card.classList.contains('fi') ? 'fi'
-                : card.classList.contains('ca') ? 'ca'
-                : card.classList.contains('st') ? 'st' : null;
-      if(!mod) return;
-      card.addEventListener('mouseenter', () => { targetSpeed = 1.6; setElectronColors(mod); });
-      card.addEventListener('mouseleave', () => { targetSpeed = 1; setElectronColors('default'); });
-      card.addEventListener('touchstart', () => { targetSpeed = 1.6; setElectronColors(mod); }, {passive:true});
-      card.addEventListener('touchend',   () => { setTimeout(()=>{ targetSpeed=1; setElectronColors('default'); }, 600); }, {passive:true});
-    });
-  }
-  // Esperar a que el DOM esté listo
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', hookCards);
-  } else {
-    setTimeout(hookCards, 100);
-  }
-
   let t = 0;
   function frame(){
     t++;
-    // Suavizar la transición de velocidad
-    currentSpeed += (targetSpeed - currentSpeed) * 0.06;
     orbits.forEach(o => {
-      const a = o.angle + t * o.speed * currentSpeed;
+      const a = o.angle + t * o.speed;
       const lx = RX * Math.cos(a), ly = RY * Math.sin(a);
       const c = Math.cos(o.rot), s = Math.sin(o.rot);
       o.el.setAttribute('transform',
@@ -496,14 +440,15 @@ function mathTogSteps(sid,tog){
   const cb=body.closest('.collapsible-body');
   if(cb&&on) cb.style.maxHeight=(cb.scrollHeight+body.scrollHeight+40)+'px';
 }
-function togglePanel(){
-  if(window.innerWidth>=700) return; // en desktop el panel siempre visible
-  const bot=document.getElementById('bottom');
-  const btn=document.getElementById('panel-tog-btn');
+function _togglePanel(botId,btnId,resizeFn,desktopLock=false){
+  if(desktopLock&&window.innerWidth>=700)return;
+  const bot=document.getElementById(botId);
+  const btn=document.getElementById(btnId);
   const collapsed=bot.classList.toggle('collapsed');
   btn.classList.toggle('on',!collapsed);
-  setTimeout(()=>resize(),50);
+  setTimeout(resizeFn,50);
 }
+function togglePanel(){ _togglePanel('bottom','panel-tog-btn',resize,true); }
 function toggleFrac(){
   fracMode=!fracMode;
   document.getElementById('frac-tog').classList.toggle('on',fracMode);
@@ -1384,18 +1329,19 @@ ctx.beginPath();ctx.arc(o.sx,o.sy,2.5,0,Math.PI*2);ctx.fillStyle=_canvasColors.o
 // • El guard w && rect.width && rect.height evita el crop cuando el módulo no está visible.
 // • Math.round() en las dimensiones evita subpíxeles en pantallas HiDPI.
 // • NO llamar desde fuera de este módulo — el ResizeObserver ya lo dispara automáticamente.
-function resize(){
-  const w = document.getElementById('cw');
-  if(!w) return;
-  const rect = w.getBoundingClientRect();
-  if(!rect.width || !rect.height) return;
-  const dpr = window.devicePixelRatio || 1;
-  cv.width  = Math.round(rect.width  * dpr);
-  cv.height = Math.round(rect.height * dpr);
-  cv.style.width  = rect.width  + 'px';
-  cv.style.height = rect.height + 'px';
-  draw();
+function _resizeCanvas(cwId,canvas,drawFn){
+  const w=document.getElementById(cwId);
+  if(!w||!canvas)return;
+  const rect=w.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width =Math.round(rect.width *dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  canvas.style.width =rect.width +'px';
+  canvas.style.height=rect.height+'px';
+  drawFn();
 }
+function resize(){ _resizeCanvas('cw',cv,draw); }
 cv.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,rx:rotX,ry:rotY};});
 window.addEventListener('mousemove',e=>{if(!drag)return;if(mode===3){rotY=drag.ry+(e.clientX-drag.x)*.5;rotX=drag.rx-(e.clientY-drag.y)*.5;}draw();});
 window.addEventListener('mouseup',()=>{drag=null;});
@@ -1514,18 +1460,7 @@ function emInit(){
 const _emCwObserver = new ResizeObserver(() => { emResizeCanvas(); });
 
 // ⚠ WARNING: emResizeCanvas() — igual que resize() en AL, no llamar con layout pendiente.
-function emResizeCanvas(){
-  const cw = document.getElementById('em-cw');
-  if(!cw || !emCanvas) return;
-  const rect = cw.getBoundingClientRect();
-  if(!rect.width || !rect.height) return;
-  const dpr = window.devicePixelRatio || 1;
-  emCanvas.width  = Math.round(rect.width  * dpr);
-  emCanvas.height = Math.round(rect.height * dpr);
-  emCanvas.style.width  = rect.width  + 'px';
-  emCanvas.style.height = rect.height + 'px';
-  emDraw();
-}
+function emResizeCanvas(){ _resizeCanvas('em-cw',emCanvas,emDraw); }
 
 // ── 3D PROJECTION (same as AL) ────────────────────────
 // emP3() → alias de project3D() arriba
@@ -1643,13 +1578,7 @@ function emSetCoord(c){
 function emResetView(){
   emRotX=25; emRotY=-35; emScl=1; emDraw();
 }
-function emTogglePanel(){
-  const bot=document.getElementById('em-bottom');
-  const btn=document.getElementById('em-panel-tog-btn');
-  const collapsed=bot.classList.toggle('collapsed');
-  btn.classList.toggle('on',!collapsed);
-  setTimeout(()=>emResizeCanvas(),50);
-}
+function emTogglePanel(){ _togglePanel('em-bottom','em-panel-tog-btn',emResizeCanvas); }
 
 function emShowTab(tab){
   document.querySelectorAll('.em-tab').forEach((t,i)=>{
@@ -2038,16 +1967,16 @@ const SUBMOD_CONFIG = {
     title: '<span class="al-c">Álgebra</span> Lineal',
     cards: [
       { icon:'⟶', name:'Vectores 3D', desc:'Operaciones, graficación y cálculo vectorial', id:'vectors', cls:'al-sub' },
-      { icon:'⊞',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
-      { icon:'≤',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
-      { icon:'∑',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
+      { icon:'▦',  name:'Matrices & Ec. Lineales', desc:'Operaciones, sistemas, determinantes, eigenvalores', id:'mat', cls:'al-sub' },
+      { icon:'≠',  name:'Inecuaciones', desc:'Libre, cuadrática, racional, sistemas, valor absoluto', id:'ineq', cls:'al-sub' },
+      { icon:'Σ',  name:'Sucesiones & Prog.', desc:'Término n-ésimo, PA, PG, clasificación, acotamiento', id:'seq', cls:'al-sub' },
     ]
   },
   fi: {
     title: '<span class="fi-c">Física</span>',
     cards: [
       { icon:'⚡', name:'Electromagnetismo', desc:'Coulomb, Gauss, Lorentz, Faraday, Maxwell', id:'em', cls:'fi-sub' },
-      { icon:'⚙', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
+      { icon:'🔜', name:'Más próximamente', desc:'Mecánica, Termodinámica, Óptica...', id:'soon', cls:'fi-sub', disabled:true },
     ]
   },
   ca: {
@@ -2057,15 +1986,6 @@ const SUBMOD_CONFIG = {
       { icon:'∫', name:'Cálculo Integral', desc:'Integral indefinida, definida, series de Taylor', id:'calc', cls:'ca-sub' },
       { icon:'∇', name:'Cálculo Multivariable', desc:'Derivadas parciales, gradiente, integral doble', id:'calc', cls:'ca-sub' },
       { icon:'dy', name:'Ecuaciones Diferenciales', desc:'1er orden, lineal, 2do orden coef. constantes', id:'calc', cls:'ca-sub' },
-    ]
-  },
-  st: {
-    title: '<span class="st-c">Estadística</span>',
-    cards: [
-      { icon:'μ', name:'Estadística Descriptiva', desc:'Media, mediana, moda, varianza, desviación', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'P', name:'Probabilidad', desc:'Clásica, condicional, Bayes, combinatoria', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'∼', name:'Distribuciones', desc:'Normal, binomial, Poisson, t-Student', id:'soon', cls:'st-sub', disabled:true },
-      { icon:'r²', name:'Regresión & Correlación', desc:'Lineal, múltiple, coeficiente de correlación', id:'soon', cls:'st-sub', disabled:true },
     ]
   }
 };
@@ -2114,42 +2034,6 @@ window.addEventListener('load', () => {
   history.replaceState({sc:'launcher'}, '');
   history.pushState({sc:'base'}, '');
   setAuthorVisible(true);
-
-  // ── Ripple físico en lmod-cards ──
-  document.querySelectorAll('.lmod-card').forEach(card => {
-    card.addEventListener('click', e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const size = Math.max(rect.width, rect.height);
-      const ripple = document.createElement('span');
-      ripple.className = 'sc-ripple';
-      const mod = card.classList.contains('al') ? 'var(--al)'
-                : card.classList.contains('fi') ? 'var(--fi)'
-                : card.classList.contains('ca') ? 'var(--ca)'
-                : 'var(--st)';
-      Object.assign(ripple.style, {
-        width: size + 'px', height: size + 'px',
-        left: (x - size/2) + 'px', top: (y - size/2) + 'px',
-        background: mod, opacity: '0.18',
-      });
-      card.appendChild(ripple);
-      ripple.addEventListener('animationend', () => ripple.remove());
-    });
-
-    // ── Parallax interno del ícono al mousemove ──
-    const icon = card.querySelector('.lmod-icon');
-    card.addEventListener('mousemove', e => {
-      if(!icon) return;
-      const rect = card.getBoundingClientRect();
-      const cx = (e.clientX - rect.left) / rect.width  - 0.5;
-      const cy = (e.clientY - rect.top)  / rect.height - 0.5;
-      icon.style.transform = `scale(1.2) translateY(-3px) translate(${cx*8}px, ${cy*6}px)`;
-    });
-    card.addEventListener('mouseleave', e => {
-      if(icon) icon.style.transform = '';
-    });
-  });
 
   // Delegated click para submod-cards generadas dinamicamente
   document.getElementById('submod-cards').addEventListener('click', function(e) {
@@ -3337,9 +3221,25 @@ function clearCard(id){
 // ═══════════════════════════════════════════════════════
 // PARSER NUMÉRICO
 // ═══════════════════════════════════════════════════════
-function calcParse(expr){
+function calcParse(expr, varName='x'){
   if(!expr||!expr.trim()) return null;
   let s = expr.trim();
+
+  // Normalizar variable dinámica → marcador interno _VAR_ para no colisionar con reemplazos
+  const v = varName.trim()||'x';
+  if(v!=='x'){
+    // Reemplazar la variable como palabra completa → placeholder, luego x al final
+    const vRe = new RegExp('\\b'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','g');
+    s = s.replace(vRe,'___VAR___');
+    s = s.replace(/\bx\b/g,'___X___');  // proteger x literal si existe
+    s = s.replace(/___VAR___/g,'x');
+    s = s.replace(/___X___/g,'x');
+  }
+
+  // Preparser racional: detectar polinomio/polinomio sin paréntesis agrupadores
+  // Ej: 4x^2-9/2x-3  →  (4x^2-9)/(2x-3)
+  s = rationalPreparse(s);
+
   s = s.replace(/π/g,'Math.PI');
   s = s.replace(/\bInfinity\b/g,'Infinity');
   s = s.replace(/\^/g,'**');
@@ -3364,6 +3264,29 @@ function calcParse(expr){
     fn(1,1); // test
     return fn;
   } catch(e){ return null; }
+}
+
+// Preparser racional: detecta expresiones ax²+bx+c/dx+e sin paréntesis agrupadores
+// y las normaliza a (ax²+bx+c)/(dx+e) para que findTopSlash funcione correctamente
+function rationalPreparse(s){
+  // Solo actuar si hay exactamente un / fuera de paréntesis y sin agrupadores obvios
+  let depth=0, slashIdx=-1, slashCount=0;
+  for(let i=0;i<s.length;i++){
+    if(s[i]==='(') depth++;
+    else if(s[i]===')') depth--;
+    else if(s[i]==='/'&&depth===0){ slashIdx=i; slashCount++; }
+  }
+  // Si hay exactamente un slash a nivel 0 y no hay paréntesis envolviendo todo
+  if(slashCount!==1||slashIdx<0) return s;
+  const num=s.slice(0,slashIdx).trim();
+  const den=s.slice(slashIdx+1).trim();
+  // Si num o den ya tienen paréntesis iniciales bien formados, no modificar
+  if((num.startsWith('(')&&num.endsWith(')'))||(den.startsWith('(')&&den.endsWith(')'))) return s;
+  // Si num o den son solo un número o variable simple, no hay ambigüedad — no modificar
+  const simple=/^-?[\d.]+([a-zA-Z](\^\d+)?)?$/;
+  if(simple.test(num)&&simple.test(den)) return s;
+  // Envolver ambos lados — resuelve la ambigüedad de precedencia
+  return '('+num+')/('+den+')';
 }
 
 // fN() unificada arriba — alias de compatibilidad disponible
@@ -3955,14 +3878,14 @@ function visSubstitute(fxStr, a){
 }
 
 
-function resolveIndet(fxStr,a,stepsOut){
-  const fn=calcParse(fxStr); if(!fn) return NaN;
+function resolveIndet(fxStr,a,stepsOut,varName='x'){
+  const fn=calcParse(fxStr,varName); if(!fn) return NaN;
   const {idx, str:normStr}=findTopSlash(fxStr);
 
   if(idx>0){
     const numStr=normStr.slice(0,idx).trim();
     const denStr=normStr.slice(idx+1).trim();
-    const fnN=calcParse(numStr), fnD=calcParse(denStr);
+    const fnN=calcParse(numStr,varName), fnD=calcParse(denStr,varName);
     if(!fnN||!fnD) return NaN;
 
     // L'Hôpital orden 1
@@ -4000,17 +3923,17 @@ function resolveIndet(fxStr,a,stepsOut){
 }
 
 // ── COMPUTE LIMIT ──
-function computeLimit(fxStr,aStr,side){
-  const steps=[]; const r={steps,fxStr,aStr,side};
+function computeLimit(fxStr,aStr,side,varName='x'){
+  const steps=[]; const r={steps,fxStr,aStr,side,varName};
   const a=evalA(aStr); r.a=a;
   if(isNaN(a)){
     r.error=aStr.trim()?
       'No se pudo evaluar "'+aStr+'". Usa: 0, π/4, ln(2), sqrt(2), 2π…':
-      'Ingresa el valor de x → a';
+      'Ingresa el valor de '+varName+' → a';
     return r;
   }
-  const fn=calcParse(fxStr);
-  if(!fn){ r.error='Función inválida. Ej: sin(x)/x, (x^2-4)/(x-2), sqrt(x)'; return r; }
+  const fn=calcParse(fxStr,varName);
+  if(!fn){ r.error='Función inválida. Ej: sin('+varName+')/'+varName+', ('+varName+'^2-4)/('+varName+'-2)'; return r; }
 
   // Sustitución directa
   let direct=null;
@@ -4032,8 +3955,8 @@ function computeLimit(fxStr,aStr,side){
   if(idx>0&&isFinite(a)){
     numStr=normFx.slice(0,idx).trim();
     denStr=normFx.slice(idx+1).trim();
-    const fnN=calcParse(numStr);
-    const fnD=calcParse(denStr);
+    const fnN=calcParse(numStr,varName);
+    const fnD=calcParse(denStr,varName);
     if(fnN&&fnD){
       faNum=fnN(a,0); faDen=fnD(a,0);
       isZZ=Math.abs(faNum)<1e-9&&Math.abs(faDen)<1e-9;
@@ -4044,9 +3967,8 @@ function computeLimit(fxStr,aStr,side){
   const visSub = idx>0
     ? visSubstitute(numStr,a)+' / '+visSubstitute(denStr,a)
     : visSubstitute(fxStr,a);
-  // Guardar numStr/denStr en el step de sustitución para los pasos
   if(steps.length>0) steps[0].visSub=visSub;
-  if(steps.length>0) steps[0].numStr=numStr; 
+  if(steps.length>0) steps[0].numStr=numStr;
   if(steps.length>0) steps[0].denStr=denStr;
   if(steps.length>0&&faNum!==undefined) steps[0].faNum=faNum;
   if(steps.length>0&&faDen!==undefined) steps[0].faDen=faDen;
@@ -4063,7 +3985,7 @@ function computeLimit(fxStr,aStr,side){
   // Resolver
   let resolved=NaN;
   if(r.isIndet){
-    resolved=resolveIndet(fxStr,a,steps);
+    resolved=resolveIndet(fxStr,a,steps,varName);
   } else if(isFinite(vr)&&isFinite(vl)&&Math.abs(vr-vl)<5e-5){
     resolved=(vr+vl)/2;
   } else if(side==='right') resolved=vr;
@@ -4097,13 +4019,14 @@ function computeLimit(fxStr,aStr,side){
 function limitStepsHTML(r){
   if(r.error) return errBox(r.error);
   const S=r.steps, a=fmtA(r.aStr), fx=r.fxStr;
+  const v=r.varName||'x';
   let html='<div class="lim-steps">';
   let n=1;
 
   // 1 Planteamiento
   html+=`<div class="lim-step"><div class="lim-step-num">${n++}</div><div class="lim-step-body">
     <div class="lim-step-title">Planteamiento</div>
-    <div class="lim-step-expr">lim<sub>x→${a}</sub> [ ${fx} ]</div>
+    <div class="lim-step-expr">lim<sub>${v}→${a}</sub> [ ${fx} ]</div>
   </div></div>`;
 
   // 2 Sustitución con desarrollo numérico
@@ -4112,7 +4035,7 @@ function limitStepsHTML(r){
     const visSub=sub.visSub||visSubstitute(fx,r.a);
     if(sub.direct!==null){
       html+=`<div class="lim-step"><div class="lim-step-num">${n++}</div><div class="lim-step-body">
-        <div class="lim-step-title">Sustitución x = ${a}</div>
+        <div class="lim-step-title">Sustitución ${v} = ${a}</div>
         <div class="lim-step-expr">${visSub}</div>
         <div class="lim-step-expr lim-ok">= ${fmtResult(sub.direct)}</div>
       </div></div>`;
@@ -4121,7 +4044,7 @@ function limitStepsHTML(r){
       const numV=i00?fmtNum(i00.faNum,4):'0';
       const denV=i00?fmtNum(i00.faDen,4):'0';
       html+=`<div class="lim-step"><div class="lim-step-num">${n++}</div><div class="lim-step-body">
-        <div class="lim-step-title">Sustitución x = ${a}</div>
+        <div class="lim-step-title">Sustitución ${v} = ${a}</div>
         <div class="lim-step-expr">${visSub}</div>
         ${i00?`<div class="lim-step-expr">= ${numV} / ${denV}</div>`:''}
         <div class="lim-step-expr"><span class="lim-warn">→ 0/0 Forma indeterminada</span></div>
@@ -4156,7 +4079,7 @@ function limitStepsHTML(r){
   const canc=S.find(s=>s.tipo==='cancelacion');
   if(canc){
     html+=`<div class="lim-step"><div class="lim-step-num">${n++}</div><div class="lim-step-body">
-      <div class="lim-step-title">Cancelación factor (x − ${a})</div>
+      <div class="lim-step-title">Cancelación factor (${v} − ${a})</div>
       <div class="lim-step-expr">Q_N ≈ ${fmtNum(canc.qnum)} , Q_D ≈ ${fmtNum(canc.qden)}</div>
       <div class="lim-step-expr">lim = <strong class="lim-ok">${fmtResult(canc.result)}</strong></div>
     </div></div>`;
@@ -4168,7 +4091,7 @@ function limitStepsHTML(r){
     if(lat){
       html+=`<div class="lim-step"><div class="lim-step-num">✓</div><div class="lim-step-body">
         <div class="lim-step-title">Verificación numérica</div>
-        <div class="lim-step-expr">x→${a}⁺ ≈ ${fmtNum(lat.vr)} , x→${a}⁻ ≈ ${fmtNum(lat.vl)}</div>
+        <div class="lim-step-expr">${v}→${a}⁺ ≈ ${fmtNum(lat.vr)} , ${v}→${a}⁻ ≈ ${fmtNum(lat.vl)}</div>
       </div></div>`;
     }
   }
@@ -4177,7 +4100,7 @@ function limitStepsHTML(r){
   // Caja resultado
   const showApprox=r.exact&&r.valueNum&&Math.abs(r.valueNum)>1e-10&&r.tipo!=='directo';
   html+=`<div class="calc-res-box" style="margin-top:8px;${r.exists?'border-color:var(--ca2)':''}">
-    <div class="calc-res-label">lim<sub>x→${a}</sub> [ ${fx} ]</div>
+    <div class="calc-res-label">lim<sub>${v}→${a}</sub> [ ${fx} ]</div>
     <div class="calc-res-val big">${r.value||'No existe'}</div>
     ${showApprox?`<div class="calc-res-hint">≈ ${fmtNum(r.valueNum,8)}</div>`:''}
     <div class="calc-res-hint">${
@@ -4194,60 +4117,85 @@ function limitStepsHTML(r){
 
 // ── CALCULAR LÍMITE (callback del botón) ──
 function calcLimit(){
-  const fxStr=document.getElementById('dif-lim-fx').value.trim();
-  const aStr =document.getElementById('dif-lim-a').value.trim();
-  const side =document.getElementById('dif-lim-side').value;
-  const res  =document.getElementById('res-lim');
-  if(!fxStr){ res.innerHTML=errBox('Ingresa una función f(x)'); return; }
-  const r=computeLimit(fxStr,aStr,side);
+  const fxStr  =document.getElementById('dif-lim-fx').value.trim();
+  const aStr   =document.getElementById('dif-lim-a').value.trim();
+  const side   =document.getElementById('dif-lim-side').value;
+  const varName=(document.getElementById('dif-lim-var')?.value.trim()||'x')||'x';
+  const res    =document.getElementById('res-lim');
+  if(!fxStr){ res.innerHTML=errBox('Ingresa una función f('+varName+')'); return; }
+  const r=computeLimit(fxStr,aStr,side,varName);
   res.innerHTML=limitStepsHTML(r);
 }
 
 // ── OPERACIÓN ENTRE DOS LÍMITES ──
 function calcLimitOp(){
-  const fx1  =document.getElementById('lim-op-fx1').value.trim();
-  const a1Str=document.getElementById('lim-op-a1').value.trim();
-  const s1   =document.getElementById('lim-op-side1').value;
-  const op   =document.getElementById('lim-op-op').value;
-  const fx2  =document.getElementById('lim-op-fx2').value.trim();
-  const a2Str=document.getElementById('lim-op-a2').value.trim();
-  const s2   =document.getElementById('lim-op-side2').value;
-  const res  =document.getElementById('res-lim-op');
+  const fx1   =document.getElementById('lim-op-fx1').value.trim();
+  const a1Str =document.getElementById('lim-op-a1').value.trim();
+  const s1    =document.getElementById('lim-op-side1').value;
+  const vn1   =(document.getElementById('lim-op-var1')?.value.trim()||'x')||'x';
+  const op    =document.getElementById('lim-op-op').value;
+  const fx2   =document.getElementById('lim-op-fx2').value.trim();
+  const a2Str =document.getElementById('lim-op-a2').value.trim();
+  const s2    =document.getElementById('lim-op-side2').value;
+  const vn2   =(document.getElementById('lim-op-var2')?.value.trim()||'x')||'x';
+  const res   =document.getElementById('res-lim-op');
   if(!fx1||!fx2){ res.innerHTML=errBox('Ingresa ambas funciones'); return; }
 
-  const r1=computeLimit(fx1,a1Str,s1);
-  const r2=computeLimit(fx2,a2Str,s2);
+  const r1=computeLimit(fx1,a1Str,s1,vn1);
+  const r2=computeLimit(fx2,a2Str,s2,vn2);
   const v1=r1.valueNum, v2=r2.valueNum;
   const a1=fmtA(a1Str), a2=fmtA(a2Str);
   const opSym={'+':'+','−':'−','*':'·','/':'÷'}[op]||op;
 
-  let resVal=NaN;
-  if(op==='+') resVal=v1+v2;
-  else if(op==='−') resVal=v1-v2;
-  else if(op==='*') resVal=v1*v2;
-  else if(op==='/') resVal=Math.abs(v2)>1e-12?v1/v2:NaN;
-  const resStr=fmtResult(resVal)||'Indefinido';
+  // Detectar indeterminación ∞ − ∞ antes de aritmética JS
+  let resVal=NaN, indetMsg='';
+  const inf1=!isFinite(v1), inf2=!isFinite(v2);
+  if(inf1&&inf2&&op==='−'){
+    // Intentar resolución: combinar funciones y calcular límite de la diferencia
+    if(a1Str===a2Str&&s1===s2&&vn1===vn2){
+      const combinedFx='('+fx1+')-('+fx2+')';
+      const rc=computeLimit(combinedFx,a1Str,s1,vn1);
+      if(rc.exists||rc.isInfinity){
+        resVal=rc.valueNum;
+        indetMsg='∞ − ∞ resuelto como lim(A − B)';
+      } else {
+        indetMsg='Forma ∞ − ∞ — indeterminada, reescribir como fracción';
+      }
+    } else {
+      indetMsg='Forma ∞ − ∞ — variables o puntos distintos, no simplificable';
+    }
+  } else if(inf1&&inf2&&op==='+'&&Math.sign(v1)!==Math.sign(v2)){
+    indetMsg='Forma ∞ − ∞ implícita';
+  } else {
+    if(op==='+') resVal=v1+v2;
+    else if(op==='−') resVal=v1-v2;
+    else if(op==='*') resVal=v1*v2;
+    else if(op==='/') resVal=Math.abs(v2)>1e-12?v1/v2:NaN;
+  }
+  const resStr=isNaN(resVal)?(indetMsg||'Indefinido'):fmtResult(resVal)||'Indefinido';
 
   let html='';
-  html+=`<div class="lim-op-block"><div class="lim-op-label">Límite A — lim<sub>x→${a1}</sub> [${fx1}]</div>${limitStepsHTML(r1)}</div>`;
-  html+=`<div class="lim-op-block"><div class="lim-op-label">Límite B — lim<sub>x→${a2}</sub> [${fx2}]</div>${limitStepsHTML(r2)}</div>`;
+  html+=`<div class="lim-op-block"><div class="lim-op-label">Límite A — lim<sub>${vn1}→${a1}</sub> [${fx1}]</div>${limitStepsHTML(r1)}</div>`;
+  html+=`<div class="lim-op-block"><div class="lim-op-label">Límite B — lim<sub>${vn2}→${a2}</sub> [${fx2}]</div>${limitStepsHTML(r2)}</div>`;
   html+=`<div class="calc-res-box" style="border-color:var(--gold);margin-top:8px">
     <div class="calc-res-label">L_A ${opSym} L_B</div>
     <div class="calc-res-val big">${resStr}</div>
-    <div class="calc-res-hint">${fmtResult(v1)||'?'} ${opSym} ${fmtResult(v2)||'?'} = ${resStr}</div>
+    <div class="calc-res-hint">${fmtResult(v1)||'∞'} ${opSym} ${fmtResult(v2)||'∞'} = ${resStr}</div>
+    ${indetMsg?`<div class="calc-res-hint" style="color:var(--gold)">⚠ ${indetMsg}</div>`:''}
   </div>`;
   res.innerHTML=html;
 }
 
 function calcDerivative(){
-  const fxStr = document.getElementById('dif-der-fx').value.trim();
-  const ord   = parseInt(document.getElementById('dif-der-ord').value);
-  const ptStr = document.getElementById('dif-der-pt').value.trim();
-  const res   = document.getElementById('res-der');
+  const fxStr  = document.getElementById('dif-der-fx').value.trim();
+  const ord    = parseInt(document.getElementById('dif-der-ord').value);
+  const ptStr  = document.getElementById('dif-der-pt').value.trim();
+  const varName= (document.getElementById('dif-der-var')?.value.trim()||'x')||'x';
+  const res    = document.getElementById('res-der');
   if(!fxStr){res.innerHTML=errBox('Ingresa una función');return;}
 
   const labels = ["Primera","Segunda","Tercera"];
-  const primes = ["f'(x)","f''(x)","f'''(x)"];
+  const primes = ["f'("+varName+")","f''("+varName+")","f'''("+varName+")"];
   const sym = symbolicDeriv(fxStr, ord);
   let html = '';
 
@@ -4256,26 +4204,26 @@ function calcDerivative(){
     if(ptStr!==''&&ptStr!=='opcional'){
       const x0 = parseFloat(ptStr);
       if(!isNaN(x0)){
-        const symFn = calcParse(sym.replace(/\^/g,'**'));
+        const symFn = calcParse(sym.replace(/\^/g,'**'),varName);
         if(symFn){
           const val = symFn(x0,0);
           if(isFinite(val))
-            html+=resBox(`${primes[ord-1]} en x = ${x0}`, fmtResult(val)||fN(val,8),
-              `Sustituyendo en ${sym}`);
+            html+=resBox(primes[ord-1]+' en '+varName+' = '+x0, fmtResult(val)||fN(val,8),
+              'Sustituyendo en '+sym);
         } else {
-          const fn = calcParse(fxStr);
+          const fn = calcParse(fxStr,varName);
           if(fn){
             const h=1e-6; let v;
             if(ord===1) v=(fn(x0+h,0)-fn(x0-h,0))/(2*h);
             else if(ord===2) v=(fn(x0+h,0)-2*fn(x0,0)+fn(x0-h,0))/(h*h);
             else v=(fn(x0+2*h,0)-2*fn(x0+h,0)+2*fn(x0-h,0)-fn(x0-2*h,0))/(2*h**3);
-            html+=resBox(`${primes[ord-1]} en x = ${x0}`, fN(v,8));
+            html+=resBox(primes[ord-1]+' en '+varName+' = '+x0, fN(v,8));
           }
         }
       }
     }
   } else {
-    const fn = calcParse(fxStr);
+    const fn = calcParse(fxStr,varName);
     if(!fn){res.innerHTML=errBox('Función inválida');return;}
     html+=resBox('Resultado numérico (no simbólico)','','',false);
     if(ptStr.trim()!==''&&ptStr.trim()!=='opcional'){
@@ -4285,7 +4233,7 @@ function calcDerivative(){
         if(ord===1) v=(fn(x0+h,0)-fn(x0-h,0))/(2*h);
         else if(ord===2) v=(fn(x0+h,0)-2*fn(x0,0)+fn(x0-h,0))/(h*h);
         else v=(fn(x0+2*h,0)-2*fn(x0+h,0)+2*fn(x0-h,0)-fn(x0-2*h,0))/(2*h**3);
-        html+=resBox(`${primes[ord-1]} en x = ${x0}`, fN(v,8));
+        html+=resBox(primes[ord-1]+' en '+varName+' = '+x0, fN(v,8));
       }
     }
   }
