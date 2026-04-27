@@ -164,10 +164,10 @@
     });
   }
 
+  let _bgRafId = null;
   function loop(){
-    update();
-    draw();
-    requestAnimationFrame(loop);
+    if(!document.hidden){ update(); draw(); }
+    _bgRafId = requestAnimationFrame(loop);
   }
 
   let resizeTimer;
@@ -200,14 +200,16 @@
   ];
   let t = 0;
   function frame(){
-    t++;
-    orbits.forEach(o => {
-      const a = o.angle + t * o.speed;
-      const lx = RX * Math.cos(a), ly = RY * Math.sin(a);
-      const c = Math.cos(o.rot), s = Math.sin(o.rot);
-      o.el.setAttribute('transform',
-        `translate(${(lx*c - ly*s).toFixed(2)},${(lx*s + ly*c).toFixed(2)})`);
-    });
+    if(!document.hidden){
+      t++;
+      orbits.forEach(o => {
+        const a = o.angle + t * o.speed;
+        const lx = RX * Math.cos(a), ly = RY * Math.sin(a);
+        const c = Math.cos(o.rot), s = Math.sin(o.rot);
+        o.el.setAttribute('transform',
+          `translate(${(lx*c - ly*s).toFixed(2)},${(lx*s + ly*c).toFixed(2)})`);
+      });
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -256,6 +258,27 @@ function dismissInstall(){const b=document.getElementById('install-banner');if(b
 // ── PALETTE ───────────────────────────────────────────
 // ── PWA MANIFEST (SuperCalc branding) ──────────────
 (()=>{
+  const ICON_KEY = 'sc-manifest-icon-v1111';
+
+  function injectManifestAndFavicon(icon){
+    const m={name:'SuperCalc',short_name:'SuperCalc',start_url:location.pathname,
+      display:'standalone',background_color:'#080c14',theme_color:'#7c6af7',
+      icons:[{src:icon,sizes:'192x192',type:'image/png'},{src:icon,sizes:'512x512',type:'image/png'}]};
+    const b=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
+    const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);
+    document.head.appendChild(l);
+    const fav=document.createElement('link');
+    fav.rel='icon'; fav.type='image/png'; fav.href=icon;
+    document.head.appendChild(fav);
+    const atl=document.createElement('link');
+    atl.rel='apple-touch-icon'; atl.href=icon;
+    document.head.appendChild(atl);
+  }
+
+  // Usar ícono cacheado si existe (evita redibujar 512×512 canvas en cada carga)
+  const cached = (() => { try { return localStorage.getItem(ICON_KEY); } catch(e){ return null; } })();
+  if(cached){ injectManifestAndFavicon(cached); return; }
+
   const sz=512, cv2=document.createElement('canvas');
   cv2.width=sz; cv2.height=sz;
   const cx=cv2.getContext('2d');
@@ -324,20 +347,11 @@ function dismissInstall(){const b=document.getElementById('install-banner');if(b
   drawElectron(-60, 0,  '∂','#f0c040','#f0c040', Math.round(sz*.09));
 
   const icon=cv2.toDataURL('image/png');
-  const m={name:'SuperCalc',short_name:'SuperCalc',start_url:location.pathname,
-    display:'standalone',background_color:'#080c14',theme_color:'#7c6af7',
-    icons:[{src:icon,sizes:'192x192',type:'image/png'},{src:icon,sizes:'512x512',type:'image/png'}]};
-  const b=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
-  const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);
-  document.head.appendChild(l);
-  // Favicon — reutiliza el mismo ícono Ω del manifest
-  const fav=document.createElement('link');
-  fav.rel='icon'; fav.type='image/png'; fav.href=icon;
-  document.head.appendChild(fav);
-  // Apple touch icon
-  const atl=document.createElement('link');
-  atl.rel='apple-touch-icon'; atl.href=icon;
-  document.head.appendChild(atl);
+
+  // Cachear para próximas cargas
+  try { localStorage.setItem(ICON_KEY, icon); } catch(e){}
+
+  injectManifestAndFavicon(icon);
 })();
 
 
@@ -718,8 +732,8 @@ function rM(){
       `|${a.nm}×${b.nm}| = ${fMag(crM)}`,
     ] : [];
 
-    const mkCard = (label,value,hint,steps,full=false) => {
-      const sid='mst_'+(Math.random().toString(36).slice(2,7));
+    const mkCard = (label,value,hint,steps,full=false,sidSuffix='') => {
+      const sid='mst_'+sidSuffix;
       return `<div class="math-card${full?' full':''}">
         <div class="math-label">${label}</div>
         <div class="math-value${full?' sm':''}">${value}</div>
@@ -742,11 +756,11 @@ function rM(){
     </div>
     <div class="collapsible-body" style="max-height:9999px">
     <div class="math-grid" style="margin-bottom:10px">
-      ${mkCard('Prod. punto',fN(d),eduHint('dot',d),dotSteps)}
-      ${mkCard('Ángulo',fDMS(an),'',angSteps)}
-      ${mkCard(`Proy ${a.nm}→${b.nm}`,fN(pab),'',projABSteps)}
-      ${mkCard(`Proy ${b.nm}→${a.nm}`,fN(pba),'',projBASteps)}
-      ${cr?mkCard(`${a.nm}×${b.nm}`,`(${fN(cr.x,2)}, ${fN(cr.y,2)}, ${fN(cr.z,2)})`,eduHint('cr',crM),crossSteps,true):''}
+      ${mkCard('Prod. punto',fN(d),eduHint('dot',d),dotSteps,false,`${i}_${j}_dot`)}
+      ${mkCard('Ángulo',fDMS(an),'',angSteps,false,`${i}_${j}_ang`)}
+      ${mkCard(`Proy ${a.nm}→${b.nm}`,fN(pab),'',projABSteps,false,`${i}_${j}_pab`)}
+      ${mkCard(`Proy ${b.nm}→${a.nm}`,fN(pba),'',projBASteps,false,`${i}_${j}_pba`)}
+      ${cr?mkCard(`${a.nm}×${b.nm}`,`(${fN(cr.x,2)}, ${fN(cr.y,2)}, ${fN(cr.z,2)})`,eduHint('cr',crM),crossSteps,true,`${i}_${j}_cr`):''}
     </div></div>`;
   }
   mc.innerHTML=h;
@@ -884,7 +898,7 @@ function rI(){
     const canDel=unkVecs.length>1;
     vecRows+=`<div class="unk-vec-item">
       <div class="unk-vec-name" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <input style="background:none;border:none;border-bottom:2px solid var(--blue);color:var(--blue);font-family:'Space Mono',monospace;font-size:14px;font-weight:700;width:44px;outline:none;text-align:center;padding:1px 2px" value="${v.nm}" oninput="updUnkName(${i},this.value)"/> onfocus="this.select()"
+        <input style="background:none;border:none;border-bottom:2px solid var(--blue);color:var(--blue);font-family:'Space Mono',monospace;font-size:14px;font-weight:700;width:44px;outline:none;text-align:center;padding:1px 2px" value="${v.nm}" oninput="updUnkName(${i},this.value)" onfocus="this.select()"/>
         <span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">vector ${i+1}</span>
         ${canDel?`<button class="badge badge-del" onclick="delUnkVec(${i})" style="margin-left:auto">✕</button>`:''}
       </div>
@@ -1453,7 +1467,7 @@ function emInit(){
     emDraw();
   },{passive:false});
 
-  emForceRenderAllPanels(); // primera carga: renderizar todos los paneles
+  emRenderPanels(); // primera carga: renderizar todos los paneles
   if(document.getElementById('em-cw')) _emCwObserver.observe(document.getElementById('em-cw'));
 }
 
@@ -2058,7 +2072,11 @@ function _closeSubmodNoHistory(){
 }
 
 function _closeModuleNoHistory(id){
-  if(id==='vectors')      document.getElementById('app').style.display='none';
+  if(id==='vectors'){
+    document.getElementById('app').style.display='none';
+    // Restaurar vectores del usuario si el canvas estaba mostrando un triángulo
+    if(window._triVecsBackup){ vecs = window._triVecsBackup; window._triVecsBackup = null; renderVecs(); rLeg(); }
+  }
   else if(id==='em')      document.getElementById('em-app').classList.remove('visible');
   else if(id==='mat')     document.getElementById('mat-app').classList.remove('visible');
   else if(id==='ineq'){   document.getElementById('ineq-app').classList.remove('visible'); setTimeout(()=>ineqBack(),350); }
